@@ -1,0 +1,27 @@
+package com.example.room.environment.service;
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.example.room.environment.entity.Environment;
+import com.example.room.environment.entity.dto.EnvironmentQuery;
+import com.example.room.environment.entity.dto.EnvironmentStatisticsQuery;
+
+import java.util.List;
+
+/**
+ * <p>
+ * 环境数据 服务类
+ * </p>
+ *
+ * @author helloWorld
+ * @since 2023-05-31
+ */
+public interface EnvironmentService extends IService<Environment> {
+
+    // 条件查询分页方法
+    Page<Environment> pageQuery(Long current, Long limit, EnvironmentQuery environmentQuery);
+
+    Environment getLastData();
+
+    List<Environment> getStatistics(EnvironmentStatisticsQuery query);
+}

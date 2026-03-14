@@ -1,0 +1,53 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: manage
+  datasource:
+    url: jdbc:mysql://localhost:3306/computer_room?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+logging:
+  level:
+    root: info
+mybatis-plus:
+  mapper-locations: classpath:com/example/manage/mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      # id为自增
+      id-type: auto
+
+jwt:
+  secret: hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhXD # 密钥，至少32位
+  expiration: 86400000              # 过期时间，单位毫秒（默认24小时）
+  issuer: "your-application"   # 签发者
+  algorithm: "HS256"           # 加密算法：HS256, HS384, HS512
+  header: Authorization
+  token-head: Bearer     # token 前缀
+  # 可选：刷新令牌配置
+  refresh:
+    expire: 604800000          # 刷新令牌过期时间（7天）
+
+  # 可选：白名单/黑名单配置
+  blacklist:
+    enable: true
+    cache-expire: 86400000     # 黑名单缓存24小时
+
+lohging:
+  level:
+    org.springframework.integration: DEBUG
+
+mqtt:
+  broker-url: tcp://localhost:1883
+  client-id: iot_mqtt_server
+  receive-topic: +/+/report
+  username:
+  password:
+  qos: 1
+  completion-timeout: 5000
