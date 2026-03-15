@@ -39,14 +39,14 @@ public class JwtUtil {
     }
 
     /**
-     * 生成 token，强制将 userId 存入 claims
-     * @param userId 用户ID
+     * 生成 token，强制将 accountId 存入 claims
+     * @param accountId 用户ID
      * @param username 用户名（可选）
      * @return token字符串
      */
-    public static String generateToken(Integer userId, String username) {
+    public static String generateToken(Integer accountId, String username) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userId);
+        claims.put("accountId", accountId);
         claims.put("username", username);
 
         Date now = new Date();
@@ -55,7 +55,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
                 .setClaims(claims)                  // 自定义声明
-                .setSubject(String.valueOf(userId))  // 主题也可以放 userId
+                .setSubject(String.valueOf(accountId))  // 主题也可以放 accountId
                 .setIssuedAt(now)
                 .setExpiration(expireDate)
                 .signWith(SignatureAlgorithm.HS256, secret)
@@ -80,11 +80,11 @@ public class JwtUtil {
     /**
      * 从 token 中获取用户ID
      */
-    public static Integer getUserIdFromToken(String token) {
+    public static Integer getAccountIdFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
         if (claims != null) {
             // 从 claims 中获取 userId，注意类型转换
-            return claims.get("userId", Integer.class);
+            return claims.get("accountId", Integer.class);
         }
         return null;
     }
@@ -110,10 +110,10 @@ public class JwtUtil {
     /**
      * 从请求中直接获取当前用户ID（便捷方法）
      */
-    public static Integer getUserIdByJwtToken(HttpServletRequest request) {
+    public static Integer getAccountIdByJwtToken(HttpServletRequest request) {
         String token = getTokenFromRequest(request);
         if (token != null) {
-            return getUserIdFromToken(token);
+            return getAccountIdFromToken(token);
         }
         return null;
     }

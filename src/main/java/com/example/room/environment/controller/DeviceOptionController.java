@@ -86,7 +86,7 @@ public class DeviceOptionController {
     @PostMapping("control")
     public Result<String> controlDevice(@RequestBody DeviceOptionControl deviceOption, HttpServletRequest request) {
         String token = JwtUtil.getTokenFromRequest(request);
-        Integer userIdFromToken = JwtUtil.getUserIdFromToken(token);
+        Integer userIdFromToken = JwtUtil.getAccountIdFromToken(token);
         String topic = "room" + "/" + deviceOption.getDeviceId() + "/command";
 
         // 使用枚举生成消息体

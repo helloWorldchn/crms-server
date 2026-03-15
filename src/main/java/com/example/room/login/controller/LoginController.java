@@ -1,8 +1,8 @@
 package com.example.room.login.controller;
 
-import com.example.room.login.entity.User;
+import com.example.room.login.entity.Account;
 import com.example.room.login.entity.dto.LoginParam;
-import com.example.room.login.service.UserService;
+import com.example.room.login.service.AccountService;
 import com.example.room.util.JwtUtil;
 import com.example.room.util.Result;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import java.util.Map;
 public class LoginController {
 
     @Resource
-    private UserService userService;
+    private AccountService accountService;
 
     @PostMapping("/login")
     public Result<Map<String, Object>> login(@RequestBody LoginParam param) {
@@ -31,14 +31,14 @@ public class LoginController {
         if (StringUtils.isEmpty(param.getUsername()) || StringUtils.isEmpty(param.getPassword())) {
             return Result.fail("用户名或密码不能为空");
         }
-        User user = userService.getUserByUserName(param.getUsername());
-        if (user == null) {
+        Account account = accountService.getUserByUserName(param.getUsername());
+        if (account == null) {
             return Result.fail("用户不存在");
         }
-        if (!user.getPassword().equals(param.getPassword())) {
+        if (!account.getPassword().equals(param.getPassword())) {
             return Result.fail("密码错误");
         }
-        String token = userService.login(user);
+        String token = accountService.login(account);
         Map<String, Object> map = new HashMap<>() ;
         map.put("token", token);
         return Result.ok(map);
@@ -47,8 +47,8 @@ public class LoginController {
     @GetMapping("info")
     public Result<Map<String, Object>> info(HttpServletRequest request){
         //获取当前登录用户用户名
-        Integer userId = JwtUtil.getUserIdByJwtToken(request);
-        Map<String, Object> map = userService.info(userId);
+        Integer userId = JwtUtil.getAccountIdByJwtToken(request);
+        Map<String, Object> map = accountService.info(userId);
         return Result.ok(map);
     }
     @PostMapping("logout")
