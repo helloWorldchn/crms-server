@@ -37,7 +37,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         Account account = this.getUserInfoById(userId);
         Map<String, Object> map = new HashMap<>();
         map.put("roles", account.getRole());
-        map.put("name", account.getUsername());
+        map.put("name", account.getNickname());
         map.put("avatar", account.getAvatar());
         return map;
     }
