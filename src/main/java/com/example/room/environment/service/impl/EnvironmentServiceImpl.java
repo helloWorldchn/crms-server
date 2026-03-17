@@ -11,7 +11,6 @@ import com.example.room.environment.service.EnvironmentService;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,31 +25,26 @@ import java.util.Objects;
 @Service
 public class EnvironmentServiceImpl extends ServiceImpl<EnvironmentMapper, Environment> implements EnvironmentService {
     @Override
-    public Page<Environment> pageQuery(Long current, Long limit, EnvironmentQuery environmentQuery) {
+    public Page<Environment> pageQuery(EnvironmentQuery query) {
         // 创建page
-        Page<Environment> page = new Page<>(current, limit);
+        Page<Environment> page = new Page<>(query.getCurrentPage(), query.getPageSize());
         // 构建条件
         QueryWrapper<Environment> queryWrapper = new QueryWrapper<>();
-        if (environmentQuery == null){
-            baseMapper.selectPage(page, queryWrapper);
-            return new Page<>();
-        }
-        // 多条件组合查询
-        // MyBatis的动态sql
-        Integer source = environmentQuery.getSource();
-        String begin = environmentQuery.getBegin();
-        String end = environmentQuery.getEnd();
-        if (Objects.nonNull(source)) {
-            queryWrapper.eq("source", source); // eq等于
+
+        Integer source = query.getSource();
+        String begin = query.getBegin();
+        String end = query.getEnd();
+        if (Objects.nonNull(query.getSource())) {
+            queryWrapper.lambda().eq(Environment::getSource, source); // eq等于
         }
         if (!StringUtils.isEmpty(begin)) {
-            queryWrapper.ge("gmt_create", begin); // ge大于
+            queryWrapper.lambda().ge(Environment::getGmtCreate, begin); // ge大于等于
         }
         if (!StringUtils.isEmpty(end)) {
-            queryWrapper.le("gmt_create", end); // le小于
+            queryWrapper.lambda().le(Environment::getGmtCreate, end); // le小于等于
         }
         // 排序
-        queryWrapper.orderByDesc("gmt_create");
+        queryWrapper.lambda().orderByDesc(Environment::getGmtCreate);
         return baseMapper.selectPage(page, queryWrapper);
     }
 
@@ -58,19 +52,19 @@ public class EnvironmentServiceImpl extends ServiceImpl<EnvironmentMapper, Envir
     public List<Environment> getStatistics(EnvironmentStatisticsQuery query) {
         QueryWrapper<Environment> queryWrapper = new QueryWrapper<>();
         if (!StringUtils.isEmpty(query.getBegin())) {
-            queryWrapper.ge("gmt_create", query.getBegin()); // ge大于
+            queryWrapper.lambda().ge(Environment::getGmtCreate, query.getBegin()); // ge大于等于
         }
         if (!StringUtils.isEmpty(query.getEnd())) {
-            queryWrapper.le("gmt_create", query.getEnd()); // le小于
+            queryWrapper.lambda().le(Environment::getGmtCreate, query.getEnd()); // le小于等于
         }
-        queryWrapper.orderByDesc("gmt_create");
+        queryWrapper.lambda().orderByDesc(Environment::getGmtCreate);
         return baseMapper.selectList(queryWrapper);
     }
 
     @Override
     public Environment getLastData() {
         QueryWrapper<Environment> queryWrapper = new QueryWrapper<>();
-        queryWrapper.orderByDesc("gmt_create");
+        queryWrapper.lambda().orderByDesc(Environment::getGmtCreate);
         queryWrapper.last("limit 1");
         // Service层
         return this.getOne(queryWrapper);

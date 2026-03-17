@@ -15,7 +15,7 @@ import com.example.room.mqtt.entity.dto.MqttSendQuery;
  */
 public interface MqttSendService extends IService<MqttSend> {
     // 条件查询分页方法
-    Page<MqttSend> pageQuery(Long current, Long limit, MqttSendQuery receiveQuery);
+    Page<MqttSend> pageQuery(MqttSendQuery sendQuery);
 
     MqttSend getLastSend();
 }

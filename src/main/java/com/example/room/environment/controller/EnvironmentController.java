@@ -57,11 +57,10 @@ public class EnvironmentController {
 
     // 4.添加查询带分页的方法
     @ApiOperation(value = "条件查询分页方法")
-    @PostMapping("pageEnvironmentCondition/{current}/{limit}")
-    public Result<Page<Environment>> pageEnvironmentCondition(@PathVariable Long current, @PathVariable Long limit,
-                                                        @RequestBody(required = false) EnvironmentQuery environmentQuery) {
+    @PostMapping("pageEnvironmentCondition")
+    public Result<Page<Environment>> pageEnvironmentCondition2(@RequestBody(required = false) EnvironmentQuery environmentQuery) {
         // 调用方法，实现分页查询
-        Page<Environment> resultPage = environmentService.pageQuery(current, limit, environmentQuery);
+        Page<Environment> resultPage = environmentService.pageQuery(environmentQuery);
         return Result.ok(resultPage);
     }
 

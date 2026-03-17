@@ -19,7 +19,7 @@ import java.util.List;
 public interface EnvironmentService extends IService<Environment> {
 
     // 条件查询分页方法
-    Page<Environment> pageQuery(Long current, Long limit, EnvironmentQuery environmentQuery);
+    Page<Environment> pageQuery(EnvironmentQuery environmentQuery);
 
     Environment getLastData();
 

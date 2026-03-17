@@ -47,11 +47,10 @@ public class MqttReceiveController {
 
     // 4.添加查询带分页的方法
     @ApiOperation(value = "条件查询分页方法")
-    @PostMapping("pageReceiveCondition/{current}/{limit}")
-    public Result<Page<MqttReceive>> pageReceiveCondition(@PathVariable Long current, @PathVariable Long limit,
-                                                    @RequestBody(required = false) MqttReceiveQuery receiveQuery) {
+    @PostMapping("pageReceiveCondition")
+    public Result<Page<MqttReceive>> pageReceiveCondition(@RequestBody MqttReceiveQuery receiveQuery) {
         // 调用方法，实现分页查询
-        Page<MqttReceive> resultPage = receiveService.pageQuery(current, limit, receiveQuery);
+        Page<MqttReceive> resultPage = receiveService.pageQuery(receiveQuery);
         return Result.ok(resultPage);
     }
 

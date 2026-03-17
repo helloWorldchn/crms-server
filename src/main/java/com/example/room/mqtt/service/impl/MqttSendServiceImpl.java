@@ -15,24 +15,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class MqttSendServiceImpl extends ServiceImpl<MqttSendMapper, MqttSend> implements MqttSendService {
     @Override
-    public Page<MqttSend> pageQuery(Long current, Long limit, MqttSendQuery sendQuery) {
+    public Page<MqttSend> pageQuery(MqttSendQuery sendQuery) {
         // 创建page
-        Page<MqttSend> mqttSendPage = new Page<>(current, limit);
+        Page<MqttSend> mqttSendPage = new Page<>(sendQuery.getCurrentPage(), sendQuery.getPageSize());
         // 构建条件
         QueryWrapper<MqttSend> queryWrapper = new QueryWrapper<>();
-        if (sendQuery == null){
-            baseMapper.selectPage(mqttSendPage, queryWrapper);
-            return new Page<>();
+
+        if (!StringUtils.isEmpty(sendQuery.getBegin())) {
+            queryWrapper.lambda().ge(MqttSend::getSendTime, sendQuery.getBegin()); // ge大于
         }
-        // 多条件组合查询
-        // MyBatis的动态sql
-        String begin = sendQuery.getBegin();
-        String end = sendQuery.getEnd();
-        if (!StringUtils.isEmpty(begin)) {
-            queryWrapper.lambda().ge(MqttSend::getSendTime, begin); // ge大于
-        }
-        if (!StringUtils.isEmpty(end)) {
-            queryWrapper.lambda().le(MqttSend::getSendTime, end); // le小于
+        if (!StringUtils.isEmpty(sendQuery.getEnd())) {
+            queryWrapper.lambda().le(MqttSend::getSendTime, sendQuery.getEnd()); // le小于
         }
         // 排序
         queryWrapper.lambda().orderByDesc(MqttSend::getSendTime);

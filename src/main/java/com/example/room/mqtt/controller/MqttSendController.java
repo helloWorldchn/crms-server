@@ -48,11 +48,10 @@ public class MqttSendController {
 
     // 4.添加查询带分页的方法
     @ApiOperation(value = "条件查询分页方法")
-    @PostMapping("pageSendCondition/{current}/{limit}")
-    public Result<Page<MqttSend>> pageSendCondition(@PathVariable Long current, @PathVariable Long limit,
-                                                          @RequestBody(required = false) MqttSendQuery sendQuery) {
+    @PostMapping("pageSendCondition")
+    public Result<Page<MqttSend>> pageSendCondition(@RequestBody(required = false) MqttSendQuery sendQuery) {
         // 调用方法，实现分页查询
-        Page<MqttSend> resultPage = sendService.pageQuery(current, limit, sendQuery);
+        Page<MqttSend> resultPage = sendService.pageQuery(sendQuery);
         return Result.ok(resultPage);
     }
 

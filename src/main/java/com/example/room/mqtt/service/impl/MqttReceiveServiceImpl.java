@@ -16,24 +16,16 @@ import org.apache.commons.lang3.StringUtils;
 public class MqttReceiveServiceImpl extends ServiceImpl<MqttReceiveMapper, MqttReceive> implements MqttReceiveService {
 
     @Override
-    public Page<MqttReceive> pageQuery(Long current, Long limit, MqttReceiveQuery receiveQuery) {
+    public Page<MqttReceive> pageQuery(MqttReceiveQuery receiveQuery) {
         // 创建page
-        Page<MqttReceive> mqttReceivePage = new Page<>(current, limit);
+        Page<MqttReceive> mqttReceivePage = new Page<>(receiveQuery.getCurrentPage(), receiveQuery.getPageSize());
         // 构建条件
         QueryWrapper<MqttReceive> queryWrapper = new QueryWrapper<>();
-        if (receiveQuery == null){
-            baseMapper.selectPage(mqttReceivePage, queryWrapper);
-            return new Page<>();
+        if (!StringUtils.isEmpty(receiveQuery.getBegin())) {
+            queryWrapper.lambda().ge(MqttReceive::getReceiveTime, receiveQuery.getBegin()); // ge大于
         }
-        // 多条件组合查询
-        // MyBatis的动态sql
-        String begin = receiveQuery.getBegin();
-        String end = receiveQuery.getEnd();
-        if (!StringUtils.isEmpty(begin)) {
-            queryWrapper.lambda().ge(MqttReceive::getReceiveTime, begin); // ge大于
-        }
-        if (!StringUtils.isEmpty(end)) {
-            queryWrapper.lambda().le(MqttReceive::getReceiveTime, end); // le小于
+        if (!StringUtils.isEmpty(receiveQuery.getEnd())) {
+            queryWrapper.lambda().le(MqttReceive::getReceiveTime, receiveQuery.getEnd()); // le小于
         }
         // 排序
         queryWrapper.lambda().orderByDesc(MqttReceive::getReceiveTime);

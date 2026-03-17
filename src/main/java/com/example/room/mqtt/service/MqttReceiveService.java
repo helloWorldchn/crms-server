@@ -15,7 +15,7 @@ import com.example.room.mqtt.entity.dto.MqttReceiveQuery;
  */
 public interface MqttReceiveService extends IService<MqttReceive> {
     // 条件查询分页方法
-    Page<MqttReceive> pageQuery(Long current, Long limit, MqttReceiveQuery receiveQuery);
+    Page<MqttReceive> pageQuery(MqttReceiveQuery receiveQuery);
 
     MqttReceive getLastReceive();
 }

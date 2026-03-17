@@ -22,4 +22,9 @@ public class MqttReceiveQuery implements Serializable {
     @ApiModelProperty(value = "查询结束时间", example = "2019-12-01 10:10:10")
     private String end;
 
+    @ApiModelProperty(value = "当前页", example = "1")
+    private Integer currentPage;
+
+    @ApiModelProperty(value = "每页记录数", example = "10")
+    private Integer pageSize;
 }
