@@ -46,7 +46,7 @@ lohging:
 mqtt:
   broker-url: tcp://localhost:1883
   client-id: iot_mqtt_server
-  receive-topic: +/+/report
+  receive-topic: +/+/report,resp/room/stm32_01/command
   username:
   password:
   qos: 1

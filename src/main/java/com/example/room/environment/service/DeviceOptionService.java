@@ -20,4 +20,5 @@ public interface DeviceOptionService extends IService<DeviceOption> {
     Page<DeviceOption> pageQuery(Long current, Long limit, DeviceOptionQuery deviceOptionQuery);
 
     boolean controlDevice(DeviceOptionControl deviceOption, String operatorId);
+    void onMqttMessage(String topic, String payload);
 }

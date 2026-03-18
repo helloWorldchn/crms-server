@@ -3,6 +3,7 @@ package com.example.room.mqtt.common;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.example.room.environment.entity.Environment;
+import com.example.room.environment.service.DeviceOptionService;
 import com.example.room.environment.service.EnvironmentService;
 import com.example.room.mqtt.entity.MqttReceive;
 import com.example.room.mqtt.service.MqttReceiveService;
@@ -24,6 +25,9 @@ public class MqttProcessMessageService {
     @Resource
     private EnvironmentService environmentService;
 
+    @Resource
+    private DeviceOptionService deviceOptionService;
+
 
     @Transactional(rollbackFor = Exception.class)
     public void processMessage(String topic, String payload) {
@@ -36,8 +40,13 @@ public class MqttProcessMessageService {
 
         mqttReceiveService.save(dataEntity);
 
-        // 2. 解析并处理环境数据
-        processEnvironmentData(payload);
+        if (topic.contains("report")) {
+            // 2. 解析并处理环境数据
+            processEnvironmentData(payload);
+        } else if (topic.contains("resp")) {
+            // 2. 解析并处理报警数据
+            deviceOptionService.onMqttMessage(topic, payload);
+        }
     }
 
     private void processEnvironmentData(String payload) {
@@ -165,11 +174,6 @@ public class MqttProcessMessageService {
             }
             // 插入到数据库
             boolean saved = environmentService.save(environment);
-            if (saved) {
-                log.info("environment数据插入成功: temperature={}, humidity={}, smoke={}", environment.getTemperature(), environment.getHumidity(), environment.getGasPpm());
-            } else {
-                log.error("environment数据插入失败");
-            }
         } catch (Exception e) {
             log.error("处理\"environment数据时发生异常: {}", e.getMessage(), e);
         }

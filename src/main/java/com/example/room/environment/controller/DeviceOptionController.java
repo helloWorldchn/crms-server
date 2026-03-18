@@ -8,6 +8,7 @@ import com.example.room.environment.entity.enums.DeviceCommandEnum;
 import com.example.room.environment.service.DeviceOptionService;
 import com.example.room.mqtt.common.MqttSendMessageService;
 import com.example.room.util.JwtUtil;
+import com.example.room.util.RequestIdGenerator;
 import com.example.room.util.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,6 +18,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * <p>
@@ -82,24 +87,18 @@ public class DeviceOptionController {
             return Result.fail("修改失败");
     }
 
+
     @ApiOperation("反控操作")
     @PostMapping("control")
     public Result<String> controlDevice(@RequestBody DeviceOptionControl deviceOption, HttpServletRequest request) {
         String token = JwtUtil.getTokenFromRequest(request);
         Integer userIdFromToken = JwtUtil.getAccountIdFromToken(token);
-        String topic = "room" + "/" + deviceOption.getDeviceId() + "/command";
 
-        // 使用枚举生成消息体
-        DeviceCommandEnum commandEnum = DeviceCommandEnum.fromCode(deviceOption.getCommand());
-        String message = "{\"" + deviceOption.getDeviceType() + "\":" +
-                (commandEnum != null ? commandEnum.getIntValue() : 0) +
-                "}";
-        boolean success = mqttSendMessageService.sendMessage(topic, message);
         boolean b = deviceOptionService.controlDevice(deviceOption, String.valueOf(userIdFromToken));
         if (b) {
             return Result.ok();
         } else
-            return Result.fail("修改失败");
+            return Result.fail("操作失败，请稍后重试");
     }
 
 }
