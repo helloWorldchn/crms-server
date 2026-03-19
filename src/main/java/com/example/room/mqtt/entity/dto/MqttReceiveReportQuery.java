@@ -11,8 +11,8 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="MqttSend查询对象", description="MqttSend查询对象")
-public class MqttSendQuery implements Serializable {
+@ApiModel(value="MqttReceive查询对象", description="MqttReceive查询")
+public class MqttReceiveReportQuery implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

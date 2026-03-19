@@ -1,9 +1,9 @@
 package com.example.room.mqtt.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.room.mqtt.entity.MqttSend;
-import com.example.room.mqtt.entity.dto.MqttSendQuery;
-import com.example.room.mqtt.service.MqttSendService;
+import com.example.room.mqtt.entity.MqttSendCmd;
+import com.example.room.mqtt.entity.dto.MqttSendCmdQuery;
+import com.example.room.mqtt.service.MqttSendCmdService;
 import com.example.room.util.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,29 +16,29 @@ import java.util.List;
 
 @Api("MQTT发送消息管理")
 @RestController
-@RequestMapping("/mqtt/send")
-public class MqttSendController {
+@RequestMapping("/mqtt/send/cmd")
+public class MqttSendCmdController {
 
     // 把service注入
     @Resource
-    private MqttSendService sendService;
+    private MqttSendCmdService sendCmdService;
 
     //1. 查询MQTT发送消息所有数据
     // restful风格
-    // 访问地址  http://localhost:8001/mqtt/send/findAll
+    // 访问地址  http://localhost:8001/mqtt/send/cmd/findAll
     @ApiOperation(value = "所有MQTT发送记录列表")
     @GetMapping("findAll")
-    public Result<List<MqttSend>> findAllSend() {
+    public Result<List<MqttSendCmd>> findAllSendCmd() {
         // 调用service的方法实现查询所有的操作
-        List<MqttSend> list = sendService.list();
+        List<MqttSendCmd> list = sendCmdService.list();
         return Result.ok(list);
     }
 
     // 2.逻辑删除MQTT发送消息讲师方法
     @ApiOperation(value = "逻辑删除")
     @DeleteMapping("{id}")
-    public Result<String> removeSend(@ApiParam(name = "id", value = "消息id", required = true) @PathVariable String id) {
-        boolean flag = sendService.removeById(id);
+    public Result<String> removeSendCmd(@ApiParam(name = "id", value = "消息id", required = true) @PathVariable String id) {
+        boolean flag = sendCmdService.removeById(id);
         if (flag) {
             return Result.ok();
         } else {
@@ -48,26 +48,26 @@ public class MqttSendController {
 
     // 4.添加查询带分页的方法
     @ApiOperation(value = "条件查询分页方法")
-    @PostMapping("pageSendCondition")
-    public Result<Page<MqttSend>> pageSendCondition(@RequestBody(required = false) MqttSendQuery sendQuery) {
+    @PostMapping("pageSendCmdCondition")
+    public Result<Page<MqttSendCmd>> pageSendCmdCondition(@RequestBody(required = false) MqttSendCmdQuery sendQuery) {
         // 调用方法，实现分页查询
-        Page<MqttSend> resultPage = sendService.pageQuery(sendQuery);
+        Page<MqttSendCmd> resultPage = sendCmdService.pageQuery(sendQuery);
         return Result.ok(resultPage);
     }
 
     @ApiOperation(value = "获取最新一条记录")
-    @GetMapping("getLastSend")
-    public Result<MqttSend> getLastSend() {
+    @GetMapping("getLastSendCmd")
+    public Result<MqttSendCmd> getLastSendCmd() {
         // 调用方法，实现分页查询
-        MqttSend send = sendService.getLastSend();
+        MqttSendCmd send = sendCmdService.getLastSendCmd();
         return Result.ok(send);
     }
 
     @ApiOperation("添加MQTT发送记录")
-    @PostMapping("addMqttSend")
-    public Result<String> addMqttSend(@RequestBody MqttSend mqttSend) {
-        mqttSend.setSendTime(new Date());
-        boolean save = sendService.save(mqttSend);
+    @PostMapping("addSendCmd")
+    public Result<String> addSendCmd(@RequestBody MqttSendCmd mqttSendCmd) {
+        mqttSendCmd.setSendTime(new Date());
+        boolean save = sendCmdService.save(mqttSendCmd);
         if (save) {
             return Result.ok();
         } else
@@ -75,16 +75,16 @@ public class MqttSendController {
     }
 
     @ApiOperation("根据ID查询MQTT发送记录")
-    @GetMapping("getMqttSend/{id}")
-    public Result<MqttSend> getMqttSend(@PathVariable String id) {
-        MqttSend byId = sendService.getById(id);
+    @GetMapping("getSendCmd/{id}")
+    public Result<MqttSendCmd> getSendCmd(@PathVariable String id) {
+        MqttSendCmd byId = sendCmdService.getById(id);
         return Result.ok(byId);
     }
 
     @ApiOperation("修改MQTT发送记录")
-    @PostMapping("updateMqttSend")
-    public Result<String> updateMqttSend(@RequestBody MqttSend mqttSend) {
-        boolean b = sendService.updateById(mqttSend);
+    @PostMapping("updateSendCmd")
+    public Result<String> updateSendCmd(@RequestBody MqttSendCmd mqttSendCmd) {
+        boolean b = sendCmdService.updateById(mqttSendCmd);
         if (b) {
             return Result.ok();
         } else

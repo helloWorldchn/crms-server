@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.room.environment.entity.DeviceOption;
 import com.example.room.environment.entity.dto.DeviceOptionControl;
 import com.example.room.environment.entity.dto.DeviceOptionQuery;
+import com.example.room.environment.entity.dto.DeviceOptionVo;
 
 /**
  * <p>
@@ -17,7 +18,7 @@ import com.example.room.environment.entity.dto.DeviceOptionQuery;
 public interface DeviceOptionService extends IService<DeviceOption> {
 
     // 条件查询分页方法
-    Page<DeviceOption> pageQuery(Long current, Long limit, DeviceOptionQuery deviceOptionQuery);
+    Page<DeviceOptionVo> pageQuery(DeviceOptionQuery deviceOptionQuery);
 
     boolean controlDevice(DeviceOptionControl deviceOption, String operatorId);
     void onMqttMessage(String topic, String payload);

@@ -12,7 +12,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value="MqttReceive查询对象", description="MqttReceive查询")
-public class MqttReceiveQuery implements Serializable {
+public class MqttReceiveCmdRespQuery implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

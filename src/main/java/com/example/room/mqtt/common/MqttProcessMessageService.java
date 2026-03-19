@@ -5,8 +5,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.room.environment.entity.Environment;
 import com.example.room.environment.service.DeviceOptionService;
 import com.example.room.environment.service.EnvironmentService;
-import com.example.room.mqtt.entity.MqttReceive;
-import com.example.room.mqtt.service.MqttReceiveService;
+import com.example.room.mqtt.entity.MqttReceiveCmdResp;
+import com.example.room.mqtt.entity.MqttReceiveReport;
+import com.example.room.mqtt.service.MqttReceiveCmdRespService;
+import com.example.room.mqtt.service.MqttReceiveReportService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +22,10 @@ import java.util.Date;
 public class MqttProcessMessageService {
 
     @Resource
-    private MqttReceiveService mqttReceiveService;
+    private MqttReceiveReportService mqttReceiveReportService;
+
+    @Resource
+    private MqttReceiveCmdRespService mqttReceiveCmdRespService;
 
     @Resource
     private EnvironmentService environmentService;
@@ -31,19 +36,24 @@ public class MqttProcessMessageService {
 
     @Transactional(rollbackFor = Exception.class)
     public void processMessage(String topic, String payload) {
-        // 1. 原始JSON直接落库
-        MqttReceive dataEntity = new MqttReceive();
-        dataEntity.setTopic(topic);
-        dataEntity.setPayload(payload);
-        dataEntity.setReceiveTime(new Date());
-        dataEntity.setDeviceId(parseDeviceIdFromTopic(topic));
-
-        mqttReceiveService.save(dataEntity);
-
         if (topic.contains("report")) {
+            // 1. 原始JSON直接落库
+            MqttReceiveReport dataEntity = new MqttReceiveReport();
+            dataEntity.setTopic(topic);
+            dataEntity.setPayload(payload);
+            dataEntity.setReceiveTime(new Date());
+            dataEntity.setDeviceId(parseDeviceIdFromTopic(topic));
+            mqttReceiveReportService.save(dataEntity);
             // 2. 解析并处理环境数据
             processEnvironmentData(payload);
         } else if (topic.contains("resp")) {
+            // 1. 原始JSON直接落库
+            MqttReceiveCmdResp dataEntity = new MqttReceiveCmdResp();
+            dataEntity.setTopic(topic);
+            dataEntity.setPayload(payload);
+            dataEntity.setReceiveTime(new Date());
+            dataEntity.setDeviceId(parseDeviceIdFromTopic(topic));
+            mqttReceiveCmdRespService.save(dataEntity);
             // 2. 解析并处理报警数据
             deviceOptionService.onMqttMessage(topic, payload);
         }

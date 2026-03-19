@@ -1,13 +1,18 @@
-package com.example.room.environment.entity.dto;
+package com.example.room.mqtt.entity.dto;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
-// 前端传递过来的数据封装到该类的对象中
 @Data
-public class DeviceOptionQuery implements Serializable {
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
+@ApiModel(value="MqttSend查询对象", description="MqttSend查询对象")
+public class MqttSendCmdQuery implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

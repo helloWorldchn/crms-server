@@ -4,11 +4,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.room.environment.entity.DeviceOption;
 import com.example.room.environment.entity.dto.DeviceOptionControl;
 import com.example.room.environment.entity.dto.DeviceOptionQuery;
-import com.example.room.environment.entity.enums.DeviceCommandEnum;
+import com.example.room.environment.entity.dto.DeviceOptionVo;
 import com.example.room.environment.service.DeviceOptionService;
 import com.example.room.mqtt.common.MqttSendMessageService;
 import com.example.room.util.JwtUtil;
-import com.example.room.util.RequestIdGenerator;
 import com.example.room.util.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,10 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * <p>
@@ -34,9 +29,8 @@ import java.util.concurrent.TimeoutException;
 @Api(description = "反控操作记录数据管理")
 @RestController
 @RequestMapping("/service/deviceOption")
-//@CrossOrigin // 解决跨域问题
 public class DeviceOptionController {
-    // 把service注入
+
     @Resource
     private DeviceOptionService deviceOptionService;
     @Resource
@@ -48,7 +42,6 @@ public class DeviceOptionController {
         return Result.ok(list);
     }
 
-    // 2.逻辑删除讲师方法
     @ApiOperation(value = "逻辑删除")
     @DeleteMapping("{id}")
     public Result<String> removeDeviceOption(@ApiParam(name = "id", value = "环境数据id", required = true) @PathVariable String id) {
@@ -60,13 +53,11 @@ public class DeviceOptionController {
         }
     }
 
-    // 4.添加查询带分页的方法
     @ApiOperation(value = "条件查询分页方法")
-    @PostMapping("pageDeviceOptionCondition/{current}/{limit}")
-    public Result<Page<DeviceOption>> pageDeviceOptionCondition(@PathVariable Long current, @PathVariable Long limit,
-                                                        @RequestBody(required = false) DeviceOptionQuery deviceOptionQuery) {
+    @PostMapping("pageDeviceOptionCondition")
+    public Result<Page<DeviceOptionVo>> pageDeviceOptionCondition(@RequestBody DeviceOptionQuery deviceOptionQuery) {
         // 调用方法，实现分页查询
-        Page<DeviceOption> resultPage = deviceOptionService.pageQuery(current, limit, deviceOptionQuery);
+        Page<DeviceOptionVo> resultPage = deviceOptionService.pageQuery(deviceOptionQuery);
         return Result.ok(resultPage);
     }
 

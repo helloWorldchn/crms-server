@@ -1,7 +1,7 @@
 package com.example.room.mqtt.common;
 
-import com.example.room.mqtt.entity.MqttSend;
-import com.example.room.mqtt.service.MqttSendService;
+import com.example.room.mqtt.entity.MqttSendCmd;
+import com.example.room.mqtt.service.MqttSendCmdService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
@@ -19,7 +19,7 @@ public class MqttSendMessageService {
     private MessageChannel mqttOutputChannel;
 
     @Resource
-    private MqttSendService mqttSendService;
+    private MqttSendCmdService mqttSendCmdService;
 
     /**
      * 发送字符串消息到指定主题
@@ -38,12 +38,12 @@ public class MqttSendMessageService {
             boolean sent = mqttOutputChannel.send(message);
             if (sent) {
                 System.out.printf("消息发送成功 -> [主题:%s] [内容:%s]%n", topic, payload);
-                MqttSend mqttSend = new MqttSend();
-                mqttSend.setTopic(topic);
-                mqttSend.setPayload(payload);
-                mqttSend.setDeviceId(parseDeviceIdFromTopic(topic));
-                mqttSend.setSendTime(new Date());
-                mqttSendService.save(mqttSend);
+                MqttSendCmd mqttSendCmd = new MqttSendCmd();
+                mqttSendCmd.setTopic(topic);
+                mqttSendCmd.setPayload(payload);
+                mqttSendCmd.setDeviceId(parseDeviceIdFromTopic(topic));
+                mqttSendCmd.setSendTime(new Date());
+                mqttSendCmdService.save(mqttSendCmd);
             } else {
                 System.err.printf("消息发送失败 -> [主题:%s] [内容:%s]%n", topic, payload);
             }

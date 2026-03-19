@@ -8,23 +8,31 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.room.environment.entity.DeviceOption;
 import com.example.room.environment.entity.dto.DeviceOptionControl;
 import com.example.room.environment.entity.dto.DeviceOptionQuery;
+import com.example.room.environment.entity.dto.DeviceOptionVo;
 import com.example.room.environment.entity.enums.DeviceCommandEnum;
+import com.example.room.environment.entity.enums.DeviceTypeEnum;
 import com.example.room.environment.mapper.DeviceOptionMapper;
 import com.example.room.environment.service.DeviceOptionService;
+import com.example.room.login.entity.Account;
+import com.example.room.login.mapper.AccountMapper;
 import com.example.room.mqtt.common.MqttSendMessageService;
 import com.example.room.util.JwtUtil;
 import com.example.room.util.RequestIdGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.beans.Beans;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -40,30 +48,65 @@ public class DeviceOptionServiceImpl extends ServiceImpl<DeviceOptionMapper, Dev
     @Resource
     private MqttSendMessageService mqttSendMessageService;
 
+    @Resource
+    private AccountMapper accountMapper;
+
     @Override
-    public Page<DeviceOption> pageQuery(Long current, Long limit, DeviceOptionQuery deviceOptionQuery) {
-        // 创建page
-        Page<DeviceOption> page = new Page<>(current, limit);
-        // 构建条件
+    public Page<DeviceOptionVo> pageQuery(DeviceOptionQuery deviceOptionQuery) {
+        Page<DeviceOption> page = new Page<>(deviceOptionQuery.getCurrentPage(), deviceOptionQuery.getPageSize());
         QueryWrapper<DeviceOption> queryWrapper = new QueryWrapper<>();
-        if (deviceOptionQuery == null){
-            baseMapper.selectPage(page, queryWrapper);
-            return new Page<>();
+        if (!StringUtils.isEmpty(deviceOptionQuery.getBegin())) {
+            queryWrapper.lambda().ge(DeviceOption::getGmtCreate, deviceOptionQuery.getBegin()); // ge大于
         }
-        // 多条件组合查询
-        // MyBatis的动态sql
-        String begin = deviceOptionQuery.getBegin();
-        String end = deviceOptionQuery.getEnd();
-        if (!StringUtils.isEmpty(begin)) {
-            queryWrapper.ge("gmt_create", begin); // ge大于
+        if (!StringUtils.isEmpty(deviceOptionQuery.getEnd())) {
+            queryWrapper.lambda().le(DeviceOption::getGmtCreate, deviceOptionQuery.getEnd()); // le小于
         }
-        if (!StringUtils.isEmpty(end)) {
-            queryWrapper.le("gmt_create", end); // le小于
+        queryWrapper.lambda().orderByDesc(DeviceOption::getGmtCreate);
+        Page<DeviceOption> deviceOptionPage = baseMapper.selectPage(page, queryWrapper);
+
+        // 创建新的 Page<DeviceOptionVo>，保持分页参数一致
+        Page<DeviceOptionVo> voPage = new Page<>(
+                deviceOptionPage.getCurrent(),
+                deviceOptionPage.getSize(),
+                deviceOptionPage.getTotal()
+        );
+        List<DeviceOption> records = deviceOptionPage.getRecords();
+        List<String> operatorList = records.stream()
+                .map(DeviceOption::getOperator)  // 假设有getOperator()方法
+                .collect(Collectors.toList());
+
+        QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<>();
+        accountQueryWrapper.lambda().in(Account::getId, operatorList);
+
+        List<Account> accountList = accountMapper.selectList(accountQueryWrapper);
+        Map<String, String> accountMap = accountList.stream()
+                .collect(Collectors.toMap(
+                        account -> String.valueOf(account.getId()),
+                        Account::getNickname   // value: nickname
+                ));
+        // 将 DeviceOption 列表转换为 DeviceOptionVo 列表
+        List<DeviceOptionVo> voList = new ArrayList<>();
+        for (DeviceOption record : records) {
+            DeviceOptionVo vo = new DeviceOptionVo();
+            BeanUtils.copyProperties(record, vo);
+
+            DeviceTypeEnum commandEnum = DeviceTypeEnum.fromCode(record.getDeviceType());
+            vo.setDeviceTypeName(commandEnum != null ? commandEnum.getName() : "");
+
+            vo.setOperatorName(accountMap.getOrDefault(record.getOperator(), ""));
+            voList.add(vo);
         }
-        // 排序
-        queryWrapper.orderByDesc("gmt_create");
-        return baseMapper.selectPage(page, queryWrapper);
+
+        voPage.setRecords(voList);
+        return voPage;
+
+        // return baseMapper.selectPage(page, queryWrapper);
     }
+    /**
+     * 将 DeviceOption 转换为 DeviceOptionVo
+     */
+
+
     private final ConcurrentHashMap<String, CompletableFuture<Boolean>> pendingRequests = new ConcurrentHashMap<>();
     private final RequestIdGenerator idGenerator = new RequestIdGenerator();
     @Override

@@ -13,8 +13,8 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="MqttReceive", description="Mqtt接收记录")
-public class MqttReceive implements Serializable {
+@ApiModel(value="MqttReceiveReport", description="MQTT接收数据-上报")
+public class MqttReceiveReport implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

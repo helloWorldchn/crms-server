@@ -1,7 +1,7 @@
 package com.example.room.mqtt.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.example.room.mqtt.entity.MqttReceive;
+import com.example.room.mqtt.entity.MqttSendCmd;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.example.room.mqtt.entity.MqttReceive;
  * @author helloWorld
  * @since 2023-05-31
  */
-public interface MqttReceiveMapper extends BaseMapper<MqttReceive> {
+public interface MqttSendCmdMapper extends BaseMapper<MqttSendCmd> {
 
 }
