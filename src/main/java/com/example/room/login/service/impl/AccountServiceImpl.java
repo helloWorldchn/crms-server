@@ -38,6 +38,10 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         Map<String, Object> map = new HashMap<>();
         map.put("roles", account.getRole());
         map.put("name", account.getNickname());
+        map.put("phone", account.getPhone());
+        map.put("email", account.getEmail());
+        map.put("gender", account.getGender());
+        map.put("code", account.getUsername());
         map.put("avatar", account.getAvatar());
         return map;
     }
