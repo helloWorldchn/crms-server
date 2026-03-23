@@ -112,6 +112,11 @@
             <artifactId>easyexcel</artifactId>
             <version>3.1.0</version>
         </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-core</artifactId>
+        <version>5.8.25</version>
+    </dependency>
         <!-- JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

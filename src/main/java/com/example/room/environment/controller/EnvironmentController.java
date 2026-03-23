@@ -1,7 +1,10 @@
 package com.example.room.environment.controller;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.room.environment.entity.Environment;
+import com.example.room.environment.entity.dto.EnvironmentExportVO;
 import com.example.room.environment.entity.dto.EnvironmentQuery;
 import com.example.room.environment.entity.dto.EnvironmentStatisticsQuery;
 import com.example.room.environment.service.EnvironmentService;
@@ -12,8 +15,12 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * <p>
@@ -77,7 +84,40 @@ public class EnvironmentController {
         Environment environment = environmentService.getLastData();
         return Result.ok(environment);
     }
+    /**
+     * 导出环境数据到Excel
+     */
+    @ApiOperation("导出环境监测数据")
+    @PostMapping("export")
+    public void export(@RequestBody(required = false) EnvironmentQuery environmentQuery,
+                       HttpServletResponse response) {
+        try {
+            // 1. 查询所有符合条件的数据（不分页）
+            environmentQuery.setCurrentPage(1);
+            environmentQuery.setPageSize(Integer.MAX_VALUE);
 
+            // 查询数据
+            Page<Environment> pageResult = environmentService.pageQuery(environmentQuery);
+            List<Environment> list = pageResult.getRecords();
+            List<EnvironmentExportVO> exportVOList = BeanUtil.copyToList(list, EnvironmentExportVO.class);
+            AtomicInteger index = new AtomicInteger(1);
+            exportVOList.forEach(vo -> {
+                vo.setIndex(index.getAndIncrement());
+            });
+            // 2. 设置响应头
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+            String fileName = URLEncoder.encode("环境监测数据", "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+
+            // 3. 使用 EasyExcel 写出
+            EasyExcel.write(response.getOutputStream(), EnvironmentExportVO.class)
+                    .sheet("环境数据")
+                    .doWrite(exportVOList);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
     @ApiOperation("添加环境监测数据")
     @PostMapping("addEnvironment")
     public Result<String> addEnvironment(@RequestBody Environment environment) {

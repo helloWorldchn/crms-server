@@ -6,6 +6,9 @@ import com.example.room.environment.entity.Environment;
 import com.example.room.environment.entity.dto.EnvironmentQuery;
 import com.example.room.environment.entity.dto.EnvironmentStatisticsQuery;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -24,4 +27,7 @@ public interface EnvironmentService extends IService<Environment> {
     Environment getLastData();
 
     List<Environment> getStatistics(EnvironmentStatisticsQuery query);
+
+    void exportExcel(List<Environment> list, HttpServletResponse response) throws IOException;
+
 }
