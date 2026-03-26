@@ -9,7 +9,9 @@ import com.example.room.mqtt.entity.MqttReceiveCmdResp;
 import com.example.room.mqtt.entity.MqttReceiveReport;
 import com.example.room.mqtt.service.MqttReceiveCmdRespService;
 import com.example.room.mqtt.service.MqttReceiveReportService;
+import com.example.room.util.WebSocketPushUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,8 @@ public class MqttProcessMessageService {
     private DeviceOptionService deviceOptionService;
 
 
+    @Autowired
+    private WebSocketPushUtil webSocketPushUtil;
     @Transactional(rollbackFor = Exception.class)
     public void processMessage(String topic, String payload) {
         if (topic.contains("report")) {
@@ -63,6 +67,7 @@ public class MqttProcessMessageService {
         try {
             // 解析JSON字符串
             JSONObject jsonObject = JSON.parseObject(payload);
+
             /*
             {
               "dev": "stm32_01",
@@ -183,6 +188,7 @@ public class MqttProcessMessageService {
                 environment.setGmtMeasurement(new Date());
             }
             // 插入到数据库
+            webSocketPushUtil.pushToTopic("/topic/environment", environment);
             boolean saved = environmentService.save(environment);
         } catch (Exception e) {
             log.error("处理\"environment数据时发生异常: {}", e.getMessage(), e);
