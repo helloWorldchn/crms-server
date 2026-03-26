@@ -87,7 +87,7 @@ public class DeviceOptionController {
 
         boolean b = deviceOptionService.controlDevice(deviceOption, String.valueOf(userIdFromToken));
         if (b) {
-            return Result.ok();
+            return Result.ok("指令已下达");
         } else
             return Result.fail("操作失败，请稍后重试");
     }

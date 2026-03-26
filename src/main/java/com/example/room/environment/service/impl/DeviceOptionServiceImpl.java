@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.room.environment.entity.DeviceOption;
+import com.example.room.environment.entity.Environment;
 import com.example.room.environment.entity.dto.DeviceOptionControl;
 import com.example.room.environment.entity.dto.DeviceOptionQuery;
 import com.example.room.environment.entity.dto.DeviceOptionVo;
@@ -13,11 +14,13 @@ import com.example.room.environment.entity.enums.DeviceCommandEnum;
 import com.example.room.environment.entity.enums.DeviceTypeEnum;
 import com.example.room.environment.mapper.DeviceOptionMapper;
 import com.example.room.environment.service.DeviceOptionService;
+import com.example.room.environment.service.EnvironmentService;
 import com.example.room.login.entity.Account;
 import com.example.room.login.mapper.AccountMapper;
 import com.example.room.mqtt.common.MqttSendMessageService;
 import com.example.room.util.JwtUtil;
 import com.example.room.util.RequestIdGenerator;
+import com.example.room.util.WebSocketPushUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.BeanUtil;
@@ -47,10 +50,14 @@ public class DeviceOptionServiceImpl extends ServiceImpl<DeviceOptionMapper, Dev
 
     @Resource
     private MqttSendMessageService mqttSendMessageService;
+    @Resource
+    private EnvironmentService environmentService;
 
     @Resource
     private AccountMapper accountMapper;
 
+    @Resource
+    private WebSocketPushUtil webSocketPushUtil;
     @Override
     public Page<DeviceOptionVo> pageQuery(DeviceOptionQuery deviceOptionQuery) {
         Page<DeviceOption> page = new Page<>(deviceOptionQuery.getCurrentPage(), deviceOptionQuery.getPageSize());
@@ -129,38 +136,53 @@ public class DeviceOptionServiceImpl extends ServiceImpl<DeviceOptionMapper, Dev
                 ",\"cmdId\":\"" + requestId + "\"" +
                 "}";
         boolean success = mqttSendMessageService.sendMessage(topic, message);
-        try {
-            return future.get(1000L, TimeUnit.MILLISECONDS);
-        } catch (TimeoutException e) {
-            pendingRequests.remove(requestId); // 超时清理
-            return false;
-        } catch (Exception e) {
-            pendingRequests.remove(requestId);
-            return false;
-        } finally {
-            // 2. 更新数据库操作记录
-            DeviceOption deviceOption = new DeviceOption();
-            deviceOption.setDeviceId(deviceOptionControl.getDeviceId());
-            deviceOption.setDeviceType(deviceOptionControl.getDeviceType());
-            deviceOption.setCommand(deviceOptionControl.getCommand());
-            deviceOption.setOperator(operatorId);
-            deviceOption.setGmtCreate(new Date());
-            deviceOption.setIsDeleted(false);
-            this.save(deviceOption);
-        }
+        // try {
+        //     // return future.get(1000L, TimeUnit.MILLISECONDS);
+        // } catch (TimeoutException e) {
+        //     pendingRequests.remove(requestId); // 超时清理
+        //     return false;
+        // } catch (Exception e) {
+        //     pendingRequests.remove(requestId);
+        //     return false;
+        // } finally {
+        // 2. 更新数据库操作记录
+        DeviceOption deviceOption = new DeviceOption();
+        deviceOption.setDeviceId(deviceOptionControl.getDeviceId());
+        deviceOption.setDeviceType(deviceOptionControl.getDeviceType());
+        deviceOption.setCommand(deviceOptionControl.getCommand());
+        deviceOption.setOperator(operatorId);
+        deviceOption.setGmtCreate(new Date());
+        deviceOption.setIsDeleted(false);
+        return this.save(deviceOption);
+        // }
     }
     // MQTT 回调方法
     @Override
     public void onMqttMessage(String topic, String payload) {
-
         JSONObject json = JSON.parseObject(payload);
-        if (json.containsKey("cmdId")) {
-            Object cmdId = json.get("cmdId").toString();
-            CompletableFuture<Boolean> future = pendingRequests.remove(cmdId);
-            if (future != null) {
-                // 可以进一步检查回复内容是否匹配指令，但一般有 ID 就足够
-                future.complete(true);
+        // webSocketPushUtil.pushToTopic("/ws/environment", payload);
+        // 重新推送一下环境数据
+        Environment environment = environmentService.getLastData();
+        if (json.containsKey("fan")) {
+            Object fan = json.get("fan");
+            if (fan != null) {
+                environment.setFanStatus(Integer.parseInt(fan.toString()));
             }
         }
+        if (json.containsKey("led")) {
+            Object led = json.get("led");
+            if (led != null) {
+                environment.setLedStatus(Integer.parseInt(led.toString()));
+            }
+        }
+        webSocketPushUtil.pushToTopic("/topic/environment", environment);
+        // if (json.containsKey("cmdId")) {
+        //     Object cmdId = json.get("cmdId").toString();
+        //     CompletableFuture<Boolean> future = pendingRequests.remove(cmdId);
+        //     if (future != null) {
+        //         // 可以进一步检查回复内容是否匹配指令，但一般有 ID 就足够
+        //         future.complete(true);
+        //     }
+        // }
     }
 }
