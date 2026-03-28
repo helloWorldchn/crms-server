@@ -1,6 +1,8 @@
 package com.example.room.control.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -27,8 +29,9 @@ public class DeviceOption implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "设备反控记录ID")
-    @TableId(value = "id", type = IdType.ID_WORKER_STR)
-    private String id;
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long id;
 
     @ApiModelProperty(value = "数据来源（1：硬件上报；0：手动记录）")
     private String deviceId;
@@ -40,7 +43,7 @@ public class DeviceOption implements Serializable {
     private String command;
 
     @ApiModelProperty(value = "操作人")
-    private String operator;
+    private Long operatorId;
 
     @ApiModelProperty(value = "逻辑删除 1（true）已删除， 0（false）未删除")
     @TableLogic

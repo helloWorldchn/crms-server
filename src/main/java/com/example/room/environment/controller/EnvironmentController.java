@@ -7,6 +7,7 @@ import com.example.room.environment.entity.Environment;
 import com.example.room.environment.entity.dto.EnvironmentExportVO;
 import com.example.room.environment.entity.dto.EnvironmentQuery;
 import com.example.room.environment.entity.dto.EnvironmentStatisticsQuery;
+import com.example.room.environment.entity.dto.EnvironmentVO;
 import com.example.room.environment.service.EnvironmentService;
 import com.example.room.util.Result;
 import io.swagger.annotations.Api;
@@ -53,7 +54,7 @@ public class EnvironmentController {
     // 2.逻辑删除讲师方法
     @ApiOperation(value = "逻辑删除")
     @DeleteMapping("{id}")
-    public Result<String> removeEnvironment(@ApiParam(name = "id", value = "环境数据id", required = true) @PathVariable String id) {
+    public Result<String> removeEnvironment(@ApiParam(name = "id", value = "环境数据id", required = true) @PathVariable Long id) {
         boolean flag = environmentService.removeById(id);
         if (flag) {
             return Result.ok();
@@ -65,10 +66,19 @@ public class EnvironmentController {
     // 4.添加查询带分页的方法
     @ApiOperation(value = "条件查询分页方法")
     @PostMapping("pageEnvironmentCondition")
-    public Result<Page<Environment>> pageEnvironmentCondition2(@RequestBody(required = false) EnvironmentQuery environmentQuery) {
+    public Result<Page<EnvironmentVO>> pageEnvironmentCondition(@RequestBody(required = false) EnvironmentQuery environmentQuery) {
         // 调用方法，实现分页查询
-        Page<Environment> resultPage = environmentService.pageQuery(environmentQuery);
-        return Result.ok(resultPage);
+        Page<Environment> environmentPage = environmentService.pageQuery(environmentQuery);
+        List<Environment> environmentList = environmentPage.getRecords();
+        List<EnvironmentVO> voList = BeanUtil.copyToList(environmentList, EnvironmentVO.class);
+        // 创建新的 Page 对象，保留分页信息
+        Page<EnvironmentVO> voPage = new Page<>(environmentPage.getCurrent(), environmentPage.getSize(), environmentPage.getTotal());
+        voPage.setRecords(voList);
+        // 使用 map 转换，保留分页信息
+        // Page<EnvironmentVO> voPage = environmentPage.convert(entity -> {
+        //     return BeanUtil.copyToList(entity, EnvironmentVO.class);
+        // });
+        return Result.ok(voPage);
     }
 
     @ApiOperation(value = "条件查询分页方法")
@@ -131,7 +141,7 @@ public class EnvironmentController {
 
     @ApiOperation("根据ID查询环境监测数据")
     @GetMapping("getEnvironment/{id}")
-    public Result<Environment> getEnvironment(@PathVariable String id) {
+    public Result<Environment> getEnvironment(@PathVariable Long id) {
         Environment byId = environmentService.getById(id);
         return Result.ok(byId);
     }

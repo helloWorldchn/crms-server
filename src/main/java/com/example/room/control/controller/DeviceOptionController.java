@@ -83,9 +83,9 @@ public class DeviceOptionController {
     @PostMapping("control")
     public Result<String> controlDevice(@RequestBody DeviceOptionControl deviceOption, HttpServletRequest request) {
         String token = JwtUtil.getTokenFromRequest(request);
-        Integer userIdFromToken = JwtUtil.getAccountIdFromToken(token);
+        Long userIdFromToken = JwtUtil.getAccountIdFromToken(token);
 
-        boolean b = deviceOptionService.controlDevice(deviceOption, String.valueOf(userIdFromToken));
+        boolean b = deviceOptionService.controlDevice(deviceOption, userIdFromToken);
         if (b) {
             return Result.ok("指令已下达");
         } else

@@ -1,9 +1,8 @@
 package com.example.room.login.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -15,8 +14,9 @@ import java.util.Date;
 public class Account implements Serializable {
 
     @ApiModelProperty(value = "主键id")
-    @TableId
-    private Integer id;
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long id;
 
     @ApiModelProperty(value = "用户名")
     private String username;

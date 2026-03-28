@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.room.environment.entity.dto.AccountQuery;
+import com.example.room.login.entity.dto.AccountQuery;
 import com.example.room.login.entity.Account;
 import com.example.room.login.mapper.AccountMapper;
 import com.example.room.login.service.AccountService;
@@ -33,7 +33,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     }
 
     @Override
-    public Map<String, Object> info(Integer userId) {
+    public Map<String, Object> info(Long userId) {
         Account account = this.getUserInfoById(userId);
         Map<String, Object> map = new HashMap<>();
         map.put("roles", account.getRole());
@@ -47,7 +47,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     }
 
     @Override
-    public Account getUserInfoById(Integer userId) {
+    public Account getUserInfoById(Long userId) {
         QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(Account::getId, userId);
         return this.getOne(queryWrapper);
@@ -84,7 +84,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     }
 
     @Override
-    public boolean updatePassword(Integer id, String encodedPassword) {
+    public boolean updatePassword(Long id, String encodedPassword) {
 
         UpdateWrapper<Account> updateWrapper = new UpdateWrapper<>();
         updateWrapper.lambda().eq(Account::getId, id).set(Account::getPassword, encodedPassword);

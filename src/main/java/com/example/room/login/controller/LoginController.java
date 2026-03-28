@@ -47,7 +47,7 @@ public class LoginController {
     @GetMapping("info")
     public Result<Map<String, Object>> info(HttpServletRequest request){
         //获取当前登录用户用户名
-        Integer userId = JwtUtil.getAccountIdByJwtToken(request);
+        Long userId = JwtUtil.getAccountIdByJwtToken(request);
         Map<String, Object> map = accountService.info(userId);
         return Result.ok(map);
     }

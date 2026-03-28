@@ -1,10 +1,7 @@
 package com.example.room.login.controller;
 
-import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.room.environment.entity.Environment;
-import com.example.room.environment.entity.dto.AccountQuery;
-import com.example.room.environment.entity.dto.EnvironmentQuery;
+import com.example.room.login.entity.dto.AccountQuery;
 import com.example.room.login.entity.Account;
 import com.example.room.login.service.AccountService;
 import com.example.room.util.Result;
@@ -99,7 +96,7 @@ public class AccountController {
     }
     @PostMapping("/updatePassword")
     public Result<String> updatePassword(@RequestBody Map<String, Object> params) {
-        Integer id = (Integer) params.get("id");
+        Long id = (Long) params.get("id");
         String oldPassword = (String) params.get("oldPassword");
         String newPassword = (String) params.get("newPassword");
         Account account = accountService.getUserInfoById(id);

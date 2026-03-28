@@ -44,7 +44,7 @@ public class JwtUtil {
      * @param username 用户名（可选）
      * @return token字符串
      */
-    public static String generateToken(Integer accountId, String username) {
+    public static String generateToken(Long accountId, String username) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("accountId", accountId);
         claims.put("username", username);
@@ -80,11 +80,11 @@ public class JwtUtil {
     /**
      * 从 token 中获取用户ID
      */
-    public static Integer getAccountIdFromToken(String token) {
+    public static Long getAccountIdFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
         if (claims != null) {
             // 从 claims 中获取 userId，注意类型转换
-            return claims.get("accountId", Integer.class);
+            return claims.get("accountId", Long.class);
         }
         return null;
     }
@@ -110,7 +110,7 @@ public class JwtUtil {
     /**
      * 从请求中直接获取当前用户ID（便捷方法）
      */
-    public static Integer getAccountIdByJwtToken(HttpServletRequest request) {
+    public static Long getAccountIdByJwtToken(HttpServletRequest request) {
         String token = getTokenFromRequest(request);
         if (token != null) {
             return getAccountIdFromToken(token);

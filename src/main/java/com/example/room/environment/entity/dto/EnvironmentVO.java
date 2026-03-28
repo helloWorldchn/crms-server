@@ -1,4 +1,4 @@
-package com.example.room.environment.entity;
+package com.example.room.environment.entity.dto;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -24,12 +24,11 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value="Environment对象", description="环境检测数据")
-public class Environment implements Serializable {
+public class EnvironmentVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "环境监测数据ID")
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 

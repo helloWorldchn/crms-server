@@ -2,7 +2,7 @@ package com.example.room.login.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.example.room.environment.entity.dto.AccountQuery;
+import com.example.room.login.entity.dto.AccountQuery;
 import com.example.room.login.entity.Account;
 
 import java.util.Map;
@@ -16,11 +16,11 @@ public interface AccountService extends IService<Account>{
 
     Account getUserByUserName(String username);
 
-    Map<String, Object> info(Integer userId);
+    Map<String, Object> info(Long userId);
 
-    Account getUserInfoById(Integer userId);
+    Account getUserInfoById(Long userId);
 
     Page<Account> pageQuery(AccountQuery accountQuery);
 
-    boolean updatePassword(Integer id, String encodedPassword);
+    boolean updatePassword(Long id, String encodedPassword);
 }
