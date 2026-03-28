@@ -14,40 +14,45 @@ import java.util.Date;
 
 /**
  * <p>
- * 讲师
+ * 设备反控记录实体
  * </p>
  *
- * @author helloWorld
- * @since 2023-05-31
+ * @author yourname
+ * @since 2025-03-28
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="DeviceOption对象", description="设备反控记录数据")
-public class DeviceOption implements Serializable {
+@ApiModel(value = "Command对象", description = "设备反控记录")
+public class Command implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "设备反控记录ID")
+    @ApiModelProperty(value = "主键ID")
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
-    @ApiModelProperty(value = "数据来源（1：硬件上报；0：手动记录）")
+    @ApiModelProperty(value = "指令ID（业务唯一标识）")
+    private String cmdId;
+
+    @ApiModelProperty(value = "设备ID")
     private String deviceId;
 
-    @ApiModelProperty(value = "操作")
-    private String action;
+    @ApiModelProperty(value = "控制类型：1-散热")
+    private String deviceType;
 
-    @ApiModelProperty(value = "操作人")
-    private Long operatorId;
+    @ApiModelProperty(value = "命令：1-ON 2-OFF")
+    private String command;
 
-    @ApiModelProperty(value = "逻辑删除 1（true）已删除， 0（false）未删除")
-    @TableLogic
-    private Boolean isDeleted;
+    @ApiModelProperty(value = "指令状态：0-待处理 1-已发送 2-执行成功 3-执行失败 4-超时")
+    private Integer status;
 
     @ApiModelProperty(value = "创建时间")
     @TableField(fill = FieldFill.INSERT)
     private Date gmtCreate;
 
+    @ApiModelProperty(value = "逻辑删除（0-未删除，1-已删除）")
+    @TableLogic
+    private Boolean isDeleted;
 }

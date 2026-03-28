@@ -20,14 +20,8 @@ public class DeviceOptionVo implements Serializable {
     @ApiModelProperty(value = "数据来源（1：硬件上报；0：手动记录）")
     private String deviceId;
 
-    @ApiModelProperty(value = "控制类型：1-散热")
-    private String deviceType;
-
-    @ApiModelProperty(value = "设备名称")
-    private String deviceTypeName;
-
-    @ApiModelProperty(value = "命令：1-ON 2-OFF")
-    private String command;
+    @ApiModelProperty(value = "操作")
+    private String action;
 
     @ApiModelProperty(value = "操作人")
     private String operator;

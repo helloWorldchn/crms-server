@@ -10,11 +10,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum DeviceCommandEnum {
     
-    ON("ON", "1", 1),
-    OFF("OFF", "0", 0);
+    ON("ON", "开启", 1),
+    OFF("OFF", "关闭", 0);
     
     private final String code;      // 指令代码：ON/OFF
-    private final String value;     // 指令值：1/0
+    private final String value;     // 指令值：开启/关闭
     private final int intValue;     // 整数值：1/0
     
     /**

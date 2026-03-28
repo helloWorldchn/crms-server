@@ -5,7 +5,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.room.control.entity.Command;
 import com.example.room.control.entity.DeviceOption;
+import com.example.room.control.service.CommandService;
 import com.example.room.environment.entity.Environment;
 import com.example.room.control.entity.param.DeviceOptionControl;
 import com.example.room.control.entity.param.DeviceOptionQuery;
@@ -50,6 +52,9 @@ public class DeviceOptionServiceImpl extends ServiceImpl<DeviceOptionMapper, Dev
     private AccountMapper accountMapper;
 
     @Resource
+    private CommandService commandService;
+
+    @Resource
     private WebSocketPushUtil webSocketPushUtil;
     @Override
     public Page<DeviceOptionVo> pageQuery(DeviceOptionQuery deviceOptionQuery) {
@@ -90,9 +95,6 @@ public class DeviceOptionServiceImpl extends ServiceImpl<DeviceOptionMapper, Dev
             DeviceOptionVo vo = new DeviceOptionVo();
             BeanUtils.copyProperties(record, vo);
 
-            DeviceTypeEnum commandEnum = DeviceTypeEnum.fromCode(record.getDeviceType());
-            vo.setDeviceTypeName(commandEnum != null ? commandEnum.getName() : "");
-
             vo.setOperatorName(accountMap.getOrDefault(record.getOperatorId(), ""));
             voList.add(vo);
         }
@@ -124,29 +126,34 @@ public class DeviceOptionServiceImpl extends ServiceImpl<DeviceOptionMapper, Dev
 
         // 使用枚举生成消息体
         DeviceCommandEnum commandEnum = DeviceCommandEnum.fromCode(deviceOptionControl.getCommand());
+        DeviceTypeEnum typeEnum = DeviceTypeEnum.fromCode(deviceOptionControl.getDeviceType());
         String message = "{\"" + deviceOptionControl.getDeviceType() + "\":" +
                 (commandEnum != null ? commandEnum.getIntValue() : 0) +
                 ",\"cmdId\":\"" + requestId + "\"" +
                 "}";
         boolean success = mqttSendMessageService.sendMessage(topic, message);
-        // try {
-        //     // return future.get(1000L, TimeUnit.MILLISECONDS);
-        // } catch (TimeoutException e) {
-        //     pendingRequests.remove(requestId); // 超时清理
-        //     return false;
-        // } catch (Exception e) {
-        //     pendingRequests.remove(requestId);
-        //     return false;
-        // } finally {
+        if (!success) {
+            return false;
+        }
         // 2. 更新数据库操作记录
         DeviceOption deviceOption = new DeviceOption();
         deviceOption.setDeviceId(deviceOptionControl.getDeviceId());
-        deviceOption.setDeviceType(deviceOptionControl.getDeviceType());
-        deviceOption.setCommand(deviceOptionControl.getCommand());
+        assert commandEnum != null;
+        deviceOption.setAction(commandEnum.getValue()+ "-"+typeEnum.getName());
         deviceOption.setOperatorId(operatorId);
         deviceOption.setGmtCreate(new Date());
         deviceOption.setIsDeleted(false);
-        return this.save(deviceOption);
+
+        Command command = new Command();
+        command.setCmdId(requestId);
+        command.setDeviceId(deviceOptionControl.getDeviceId());
+        command.setDeviceType(deviceOptionControl.getDeviceType());
+        command.setCommand(deviceOptionControl.getCommand());
+        command.setStatus(1);
+        command.setGmtCreate(new Date());
+        command.setIsDeleted(false);
+        commandService.save(command);
+        return true;
         // }
     }
     // MQTT 回调方法
@@ -168,6 +175,18 @@ public class DeviceOptionServiceImpl extends ServiceImpl<DeviceOptionMapper, Dev
                 environment.setLedStatus(Integer.parseInt(led.toString()));
             }
         }
+        if (json.containsKey("cmdId")) {
+            QueryWrapper<Command> queryWrapper = new QueryWrapper<>();
+            queryWrapper.lambda().eq(Command::getCmdId, json.get("cmdId"));
+            queryWrapper.lambda().orderByDesc(Command::getGmtCreate);
+            queryWrapper.lambda().last("limit 1");
+            Command command = commandService.getOne(queryWrapper);
+            if (command != null) {
+                command.setStatus(2);
+            }
+            commandService.update(command, queryWrapper);
+        }
+
         webSocketPushUtil.pushToTopic("/topic/environment", environment);
         // if (json.containsKey("cmdId")) {
         //     Object cmdId = json.get("cmdId").toString();
