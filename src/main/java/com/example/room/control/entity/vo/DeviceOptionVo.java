@@ -1,4 +1,4 @@
-package com.example.room.environment.entity.dto;
+package com.example.room.control.entity.vo;
 
 import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModelProperty;

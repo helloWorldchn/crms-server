@@ -1,11 +1,11 @@
-package com.example.room.environment.service;
+package com.example.room.control.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.example.room.environment.entity.DeviceOption;
-import com.example.room.environment.entity.dto.DeviceOptionControl;
-import com.example.room.environment.entity.dto.DeviceOptionQuery;
-import com.example.room.environment.entity.dto.DeviceOptionVo;
+import com.example.room.control.entity.DeviceOption;
+import com.example.room.control.entity.param.DeviceOptionControl;
+import com.example.room.control.entity.param.DeviceOptionQuery;
+import com.example.room.control.entity.vo.DeviceOptionVo;
 
 /**
  * <p>

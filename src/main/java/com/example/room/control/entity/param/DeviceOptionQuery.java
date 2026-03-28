@@ -1,4 +1,4 @@
-package com.example.room.environment.entity.dto;
+package com.example.room.control.entity.param;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

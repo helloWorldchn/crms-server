@@ -1,7 +1,7 @@
-package com.example.room.environment.mapper;
+package com.example.room.control.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.example.room.environment.entity.DeviceOption;
+import com.example.room.control.entity.DeviceOption;
 
 /**
  * <p>

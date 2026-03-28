@@ -1,4 +1,4 @@
-package com.example.room.environment.entity.enums;
+package com.example.room.control.entity.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
