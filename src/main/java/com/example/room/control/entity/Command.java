@@ -37,7 +37,7 @@ public class Command implements Serializable {
     private String cmdId;
 
     @ApiModelProperty(value = "设备ID")
-    private String deviceId;
+    private String deviceKey;
 
     @ApiModelProperty(value = "控制类型：1-散热")
     private String deviceType;

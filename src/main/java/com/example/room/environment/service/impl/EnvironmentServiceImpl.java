@@ -117,7 +117,7 @@ public class EnvironmentServiceImpl extends ServiceImpl<EnvironmentMapper, Envir
             List<Object> row = new ArrayList<>();
             row.add(index++);  // 序号
             row.add(env.getSource() != null && env.getSource() == 1 ? "硬件上报" : "手动记录");
-            row.add(env.getDeviceId());
+            row.add(env.getDeviceKey());
             row.add(env.getTemperature());
             row.add(env.getHumidity());
             row.add(env.getGasPpm());

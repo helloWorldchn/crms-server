@@ -32,7 +32,7 @@ public class MqttSendCmd implements Serializable {
     private String payload;
 
     @ApiModelProperty(value = "发送到的设备id")
-    private String deviceId;
+    private String deviceKey;
 
     @ApiModelProperty(value = "发送时间")
     @TableField(fill = FieldFill.INSERT)

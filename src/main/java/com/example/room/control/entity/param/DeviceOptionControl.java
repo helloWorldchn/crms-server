@@ -12,7 +12,7 @@ public class DeviceOptionControl implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "设备id")
-    private String deviceId;//注意，这里使用的是String类型，前端传过来的数据无需进行类型转换
+    private String deviceKey;//注意，这里使用的是String类型，前端传过来的数据无需进行类型转换
 
     @ApiModelProperty(value = "设备指令-ON、OFF")
     private String command;

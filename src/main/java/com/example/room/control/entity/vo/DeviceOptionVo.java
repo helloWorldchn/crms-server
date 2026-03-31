@@ -13,12 +13,8 @@ public class DeviceOptionVo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "设备反控记录ID")
-    @TableId(value = "id", type = IdType.ID_WORKER_STR)
-    private String id;
-
     @ApiModelProperty(value = "数据来源（1：硬件上报；0：手动记录）")
-    private String deviceId;
+    private String deviceKey;
 
     @ApiModelProperty(value = "操作")
     private String action;

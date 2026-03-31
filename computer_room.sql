@@ -11,7 +11,7 @@
  Target Server Version : 50725
  File Encoding         : 65001
 
- Date: 28/03/2026 22:15:48
+ Date: 31/03/2026 21:54:13
 */
 
 SET NAMES utf8mb4;
@@ -47,7 +47,7 @@ DROP TABLE IF EXISTS `command`;
 CREATE TABLE `command`  (
   `id` bigint(19) NOT NULL COMMENT '主键ID',
   `cmd_id` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '指令ID',
-  `device_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `device_key` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `device_type` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '控制类型：1-散热',
   `command` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '命令：1-ON 2-OFF',
   `status` tinyint(4) NULL DEFAULT NULL COMMENT '状态\r\n',
@@ -62,7 +62,7 @@ CREATE TABLE `command`  (
 DROP TABLE IF EXISTS `device_option`;
 CREATE TABLE `device_option`  (
   `id` bigint(19) NOT NULL COMMENT '反控ID',
-  `device_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '设备ID',
+  `device_key` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '设备ID',
   `action` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '操作',
   `operator_id` bigint(19) NULL DEFAULT NULL COMMENT '操作人',
   `gmt_create` datetime NOT NULL COMMENT '创建时间',
@@ -77,7 +77,7 @@ DROP TABLE IF EXISTS `environment`;
 CREATE TABLE `environment`  (
   `id` bigint(19) NOT NULL COMMENT '环境数据ID',
   `source` tinyint(4) NULL DEFAULT 1 COMMENT '数据来源（1：硬件上报；0：手动记录）',
-  `device_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '上报设备',
+  `device_key` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '上报设备',
   `temperature` decimal(5, 2) NULL DEFAULT NULL COMMENT '温度',
   `humidity` decimal(5, 2) NULL DEFAULT NULL COMMENT '湿度',
   `gas_ppm` decimal(5, 2) NULL DEFAULT NULL COMMENT '烟雾浓度',
@@ -103,12 +103,12 @@ CREATE TABLE `mqtt_receive_cmd_resp`  (
   `id` bigint(19) NOT NULL COMMENT 'ID',
   `topic` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'topic主题',
   `payload` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'payload有效载荷',
-  `device_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '设备id',
+  `device_key` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '设备id',
   `receive_time` datetime NULL DEFAULT NULL COMMENT '接收时间',
   `is_deleted` tinyint(1) UNSIGNED ZEROFILL NULL DEFAULT 0 COMMENT '逻辑删除 1（true）已删除， 0（false）未删除',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_receive_time`(`receive_time`) USING BTREE,
-  INDEX `idx_device_id`(`device_id`) USING BTREE
+  INDEX `idx_device_id`(`device_key`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'MQTT接收数据-指令回复表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -119,12 +119,12 @@ CREATE TABLE `mqtt_receive_report`  (
   `id` bigint(19) NOT NULL COMMENT 'ID',
   `topic` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'topic主题',
   `payload` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'payload有效载荷',
-  `device_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '设备id',
+  `device_key` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '设备id',
   `receive_time` datetime NULL DEFAULT NULL COMMENT '接收时间',
   `is_deleted` tinyint(1) UNSIGNED ZEROFILL NULL DEFAULT 0 COMMENT '逻辑删除 1（true）已删除， 0（false）未删除',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_receive_time`(`receive_time`) USING BTREE,
-  INDEX `idx_device_id`(`device_id`) USING BTREE
+  INDEX `idx_device_id`(`device_key`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'MQTT接收数据-上报表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -135,12 +135,12 @@ CREATE TABLE `mqtt_send_cmd`  (
   `id` bigint(19) NOT NULL COMMENT 'ID',
   `topic` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'topic主题',
   `payload` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'payload有效载荷',
-  `device_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '设备id',
+  `device_key` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '设备id',
   `send_time` datetime NULL DEFAULT NULL COMMENT '发送时间',
   `is_deleted` tinyint(1) UNSIGNED ZEROFILL NULL DEFAULT 0 COMMENT '逻辑删除 1（true）已删除， 0（false）未删除',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_receive_time`(`send_time`) USING BTREE,
-  INDEX `idx_device_id`(`device_id`) USING BTREE
+  INDEX `idx_device_id`(`device_key`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'MQTT发送记录-指令表' ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

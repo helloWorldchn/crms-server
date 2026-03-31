@@ -122,7 +122,7 @@ public class DeviceOptionServiceImpl extends ServiceImpl<DeviceOptionMapper, Dev
         while (pendingRequests.putIfAbsent(requestId, future) != null) {
             requestId = idGenerator.nextId(); // 重新生成
         }
-        String topic = "room" + "/" + deviceOptionControl.getDeviceId() + "/command";
+        String topic = "room" + "/" + deviceOptionControl.getDeviceKey() + "/command";
 
         // 使用枚举生成消息体
         DeviceCommandEnum commandEnum = DeviceCommandEnum.fromCode(deviceOptionControl.getCommand());
@@ -130,6 +130,7 @@ public class DeviceOptionServiceImpl extends ServiceImpl<DeviceOptionMapper, Dev
         String message = "{\"" + deviceOptionControl.getDeviceType() + "\":" +
                 (commandEnum != null ? commandEnum.getIntValue() : 0) +
                 ",\"cmdId\":\"" + requestId + "\"" +
+                ",\"dev\":\"" + deviceOptionControl.getDeviceKey() + "\"" +
                 "}";
         boolean success = mqttSendMessageService.sendMessage(topic, message);
         if (!success) {
@@ -137,7 +138,7 @@ public class DeviceOptionServiceImpl extends ServiceImpl<DeviceOptionMapper, Dev
         }
         // 2. 更新数据库操作记录
         DeviceOption deviceOption = new DeviceOption();
-        deviceOption.setDeviceId(deviceOptionControl.getDeviceId());
+        deviceOption.setDeviceKey(deviceOptionControl.getDeviceKey());
         assert commandEnum != null;
         deviceOption.setAction(commandEnum.getValue()+ "-"+typeEnum.getName());
         deviceOption.setOperatorId(operatorId);
@@ -146,7 +147,7 @@ public class DeviceOptionServiceImpl extends ServiceImpl<DeviceOptionMapper, Dev
 
         Command command = new Command();
         command.setCmdId(requestId);
-        command.setDeviceId(deviceOptionControl.getDeviceId());
+        command.setDeviceKey(deviceOptionControl.getDeviceKey());
         command.setDeviceType(deviceOptionControl.getDeviceType());
         command.setCommand(deviceOptionControl.getCommand());
         command.setStatus(1);

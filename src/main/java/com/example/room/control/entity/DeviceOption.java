@@ -33,8 +33,8 @@ public class DeviceOption implements Serializable {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
-    @ApiModelProperty(value = "数据来源（1：硬件上报；0：手动记录）")
-    private String deviceId;
+    @ApiModelProperty(value = "数据来源")
+    private String deviceKey;
 
     @ApiModelProperty(value = "操作")
     private String action;

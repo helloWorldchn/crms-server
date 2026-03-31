@@ -32,7 +32,7 @@ public class MqttReceiveReport implements Serializable {
     private String payload;
 
     @ApiModelProperty(value = "接收数据来自于设备id")
-    private String deviceId;
+    private String deviceKey;
 
     @ApiModelProperty(value = "接收时间")
     @TableField(fill = FieldFill.INSERT)

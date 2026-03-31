@@ -40,13 +40,19 @@ public class MqttProcessMessageService {
     private WebSocketPushUtil webSocketPushUtil;
     @Transactional(rollbackFor = Exception.class)
     public void processMessage(String topic, String payload) {
+        JSONObject jsonObject = JSON.parseObject(payload);
+        String deviceKeyStr = "";
+        if (jsonObject.containsKey("dev")) {
+            Object deviceKey = jsonObject.get("dev");
+            deviceKeyStr = deviceKey.toString();
+        }
         if (topic.contains("report")) {
             // 1. 原始JSON直接落库
             MqttReceiveReport dataEntity = new MqttReceiveReport();
             dataEntity.setTopic(topic);
             dataEntity.setPayload(payload);
             dataEntity.setReceiveTime(new Date());
-            dataEntity.setDeviceId(parseDeviceIdFromTopic(topic));
+            dataEntity.setDeviceKey(deviceKeyStr);
             mqttReceiveReportService.save(dataEntity);
             // 2. 解析并处理环境数据
             processEnvironmentData(payload);
@@ -56,7 +62,7 @@ public class MqttProcessMessageService {
             dataEntity.setTopic(topic);
             dataEntity.setPayload(payload);
             dataEntity.setReceiveTime(new Date());
-            dataEntity.setDeviceId(parseDeviceIdFromTopic(topic));
+            dataEntity.setDeviceKey(deviceKeyStr);
             mqttReceiveCmdRespService.save(dataEntity);
             // 2. 解析并处理报警数据
             deviceOptionService.onMqttMessage(topic, payload);
@@ -93,7 +99,7 @@ public class MqttProcessMessageService {
             if (jsonObject.containsKey("dev")) {
                 Object deviceId = jsonObject.get("dev");
                 if (deviceId != null) {
-                    environment.setDeviceId(deviceId.toString());
+                    environment.setDeviceKey(deviceId.toString());
                 }
             }
 
@@ -193,21 +199,5 @@ public class MqttProcessMessageService {
         } catch (Exception e) {
             log.error("处理\"environment数据时发生异常: {}", e.getMessage(), e);
         }
-    }
-
-    /**
-     * 从topic中解析设备ID
-     * 例如: device/abc123/data -> abc123
-     */
-    private String parseDeviceIdFromTopic(String topic) {
-        if (topic == null) return null;
-        String[] parts = topic.split("/");
-        if (parts.length >= 3) {
-            return parts[2];
-        }
-        if (parts.length == 2) {
-            return parts[1];
-        }
-        return null;
     }
 }

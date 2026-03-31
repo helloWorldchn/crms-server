@@ -28,7 +28,7 @@ public class EnvironmentExportVO {
 
     @ExcelProperty("上报设备")
     @ColumnWidth(15)
-    private String deviceId;
+    private String deviceKey;
 
     @ExcelProperty("温度 (°C)")
     @ColumnWidth(12)

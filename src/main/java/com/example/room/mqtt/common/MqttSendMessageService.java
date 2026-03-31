@@ -1,5 +1,7 @@
 package com.example.room.mqtt.common;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.example.room.mqtt.entity.MqttSendCmd;
 import com.example.room.mqtt.service.MqttSendCmdService;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +43,13 @@ public class MqttSendMessageService {
                 MqttSendCmd mqttSendCmd = new MqttSendCmd();
                 mqttSendCmd.setTopic(topic);
                 mqttSendCmd.setPayload(payload);
-                mqttSendCmd.setDeviceId(parseDeviceIdFromTopic(topic));
+                JSONObject jsonObject = JSON.parseObject(payload);
+                String deviceKeyStr = "";
+                if (jsonObject.containsKey("dev")) {
+                    Object deviceKey = jsonObject.get("dev");
+                    deviceKeyStr = deviceKey.toString();
+                }
+                mqttSendCmd.setDeviceKey(deviceKeyStr);
                 mqttSendCmd.setSendTime(new Date());
                 mqttSendCmdService.save(mqttSendCmd);
             } else {
@@ -102,20 +110,5 @@ public class MqttSendMessageService {
             e.printStackTrace();
             return false;
         }
-    }
-    /**
-     * 从topic中解析设备ID
-     * 例如: device/abc123/data -> abc123
-     */
-    private String parseDeviceIdFromTopic(String topic) {
-        if (topic == null) return null;
-        String[] parts = topic.split("/");
-        if (parts.length >= 3) {
-            return parts[2];
-        }
-        if (parts.length == 2) {
-            return parts[1];
-        }
-        return null;
     }
 }
