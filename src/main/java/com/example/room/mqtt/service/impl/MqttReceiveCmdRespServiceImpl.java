@@ -3,6 +3,7 @@ package com.example.room.mqtt.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.room.environment.entity.Environment;
 import com.example.room.mqtt.entity.MqttReceiveCmdResp;
 import com.example.room.mqtt.entity.dto.MqttReceiveCmdRespQuery;
 import com.example.room.mqtt.mapper.MqttReceiveCmdRespMapper;
@@ -26,6 +27,9 @@ public class MqttReceiveCmdRespServiceImpl extends ServiceImpl<MqttReceiveCmdRes
         }
         if (!StringUtils.isEmpty(receiveQuery.getEnd())) {
             queryWrapper.lambda().le(MqttReceiveCmdResp::getReceiveTime, receiveQuery.getEnd()); // le小于
+        }
+        if (!StringUtils.isEmpty(receiveQuery.getDeviceKey())) {
+            queryWrapper.lambda().eq(MqttReceiveCmdResp::getDeviceKey, receiveQuery.getDeviceKey());
         }
         // 排序
         queryWrapper.lambda().orderByDesc(MqttReceiveCmdResp::getReceiveTime);

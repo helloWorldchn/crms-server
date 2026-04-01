@@ -17,4 +17,7 @@ public class EnvironmentStatisticsQuery implements Serializable {
     @ApiModelProperty(value = "查询结束时间", example = "2019-12-01 10:10:10")
     private String end;
 
+    @ApiModelProperty(value = "设备标识")
+    private String deviceKey;
+
 }

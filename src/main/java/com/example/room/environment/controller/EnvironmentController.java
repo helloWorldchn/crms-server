@@ -90,10 +90,11 @@ public class EnvironmentController {
 
     @ApiOperation(value = "获取最新一条数据")
     @GetMapping("getLastEnvironment")
-    public Result<Environment> getLastEnvironment() {
-        Environment environment = environmentService.getLastData();
+    public Result<Environment> getLastEnvironment(@RequestParam("deviceKey") String deviceKey) {
+        Environment environment = environmentService.getLastData(deviceKey);
         return Result.ok(environment);
     }
+
     /**
      * 导出环境数据到Excel
      */

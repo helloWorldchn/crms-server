@@ -26,6 +26,8 @@ public interface EnvironmentService extends IService<Environment> {
 
     Environment getLastData();
 
+    Environment getLastData(String deviceKey);
+
     List<Environment> getStatistics(EnvironmentStatisticsQuery query);
 
     void exportExcel(List<Environment> list, HttpServletResponse response) throws IOException;

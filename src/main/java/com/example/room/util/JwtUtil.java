@@ -88,6 +88,13 @@ public class JwtUtil {
         }
         return null;
     }
+    public static String getAccountCodeFromToken(String token) {
+        Claims claims = getClaimsFromToken(token);
+        if (claims != null) {
+            return claims.get("username", String.class);
+        }
+        return null;
+    }
 
     /**
      * 从 HttpServletRequest 中获取 token（去除 Bearer 前缀）

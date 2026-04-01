@@ -162,8 +162,13 @@ public class DeviceOptionServiceImpl extends ServiceImpl<DeviceOptionMapper, Dev
     public void onMqttMessage(String topic, String payload) {
         JSONObject json = JSON.parseObject(payload);
         // webSocketPushUtil.pushToTopic("/ws/environment", payload);
+        String deviceKeyStr = "";
+        if (json.containsKey("dev")) {
+            Object deviceKey = json.get("dev");
+            deviceKeyStr = deviceKey.toString();
+        }
         // 重新推送一下环境数据
-        Environment environment = environmentService.getLastData();
+        Environment environment = environmentService.getLastData(deviceKeyStr);
         if (json.containsKey("fan")) {
             Object fan = json.get("fan");
             if (fan != null) {
@@ -187,8 +192,8 @@ public class DeviceOptionServiceImpl extends ServiceImpl<DeviceOptionMapper, Dev
             }
             commandService.update(command, queryWrapper);
         }
-
-        webSocketPushUtil.pushToTopic("/topic/environment", environment);
+        String socketTopic = "/topic/environment/"+ deviceKeyStr;
+        webSocketPushUtil.pushToTopic(socketTopic, environment);
         // if (json.containsKey("cmdId")) {
         //     Object cmdId = json.get("cmdId").toString();
         //     CompletableFuture<Boolean> future = pendingRequests.remove(cmdId);

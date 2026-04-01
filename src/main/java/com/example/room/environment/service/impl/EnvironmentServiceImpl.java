@@ -49,6 +49,9 @@ public class EnvironmentServiceImpl extends ServiceImpl<EnvironmentMapper, Envir
         if (!StringUtils.isEmpty(end)) {
             queryWrapper.lambda().le(Environment::getGmtCreate, end); // le小于等于
         }
+        if (!StringUtils.isEmpty(query.getDeviceKey())) {
+            queryWrapper.lambda().eq(Environment::getDeviceKey, query.getDeviceKey());
+        }
         // 排序
         queryWrapper.lambda().orderByDesc(Environment::getGmtCreate);
         return baseMapper.selectPage(page, queryWrapper);
@@ -60,6 +63,9 @@ public class EnvironmentServiceImpl extends ServiceImpl<EnvironmentMapper, Envir
         if (!StringUtils.isEmpty(query.getBegin())) {
             queryWrapper.lambda().ge(Environment::getGmtCreate, query.getBegin()); // ge大于等于
         }
+        if (!StringUtils.isEmpty(query.getDeviceKey())) {
+            queryWrapper.lambda().eq(Environment::getDeviceKey, query.getDeviceKey());
+        }
         if (!StringUtils.isEmpty(query.getEnd())) {
             queryWrapper.lambda().le(Environment::getGmtCreate, query.getEnd()); // le小于等于
         }
@@ -70,6 +76,15 @@ public class EnvironmentServiceImpl extends ServiceImpl<EnvironmentMapper, Envir
     @Override
     public Environment getLastData() {
         QueryWrapper<Environment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().orderByDesc(Environment::getGmtCreate);
+        queryWrapper.last("limit 1");
+        // Service层
+        return this.getOne(queryWrapper);
+    }
+    @Override
+    public Environment getLastData(String deviceKey) {
+        QueryWrapper<Environment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(Environment::getDeviceKey, deviceKey);
         queryWrapper.lambda().orderByDesc(Environment::getGmtCreate);
         queryWrapper.last("limit 1");
         // Service层

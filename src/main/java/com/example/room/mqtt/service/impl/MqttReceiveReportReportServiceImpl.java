@@ -3,6 +3,7 @@ package com.example.room.mqtt.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.room.environment.entity.Environment;
 import com.example.room.mqtt.entity.MqttReceiveReport;
 import com.example.room.mqtt.entity.dto.MqttReceiveReportQuery;
 import com.example.room.mqtt.mapper.MqttReceiveReportMapper;
@@ -23,6 +24,9 @@ public class MqttReceiveReportReportServiceImpl extends ServiceImpl<MqttReceiveR
         QueryWrapper<MqttReceiveReport> queryWrapper = new QueryWrapper<>();
         if (!StringUtils.isEmpty(receiveQuery.getBegin())) {
             queryWrapper.lambda().ge(MqttReceiveReport::getReceiveTime, receiveQuery.getBegin()); // ge大于
+        }
+        if (!StringUtils.isEmpty(receiveQuery.getDeviceKey())) {
+            queryWrapper.lambda().eq(MqttReceiveReport::getDeviceKey, receiveQuery.getDeviceKey());
         }
         if (!StringUtils.isEmpty(receiveQuery.getEnd())) {
             queryWrapper.lambda().le(MqttReceiveReport::getReceiveTime, receiveQuery.getEnd()); // le小于

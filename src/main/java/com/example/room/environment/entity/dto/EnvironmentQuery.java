@@ -14,6 +14,9 @@ public class EnvironmentQuery implements Serializable {
     @ApiModelProperty(value = "来源 1上报 2手动")
     private Integer source;
 
+    @ApiModelProperty(value = "设备标识")
+    private String deviceKey;
+
     @ApiModelProperty(value = "查询开始时间", example = "2019-01-01 10:10:10")
     private String begin;//注意，这里使用的是String类型，前端传过来的数据无需进行类型转换
 

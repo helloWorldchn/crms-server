@@ -2,6 +2,7 @@ package com.example.room.mqtt.common;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.example.room.device.service.DeviceService;
 import com.example.room.environment.entity.Environment;
 import com.example.room.control.service.DeviceOptionService;
 import com.example.room.environment.service.EnvironmentService;
@@ -35,6 +36,8 @@ public class MqttProcessMessageService {
     @Resource
     private DeviceOptionService deviceOptionService;
 
+    @Resource
+    private DeviceService deviceService;
 
     @Autowired
     private WebSocketPushUtil webSocketPushUtil;
@@ -54,6 +57,7 @@ public class MqttProcessMessageService {
             dataEntity.setReceiveTime(new Date());
             dataEntity.setDeviceKey(deviceKeyStr);
             mqttReceiveReportService.save(dataEntity);
+            deviceService.reportData(deviceKeyStr);
             // 2. 解析并处理环境数据
             processEnvironmentData(payload);
         } else if (topic.contains("resp")) {
@@ -64,8 +68,11 @@ public class MqttProcessMessageService {
             dataEntity.setReceiveTime(new Date());
             dataEntity.setDeviceKey(deviceKeyStr);
             mqttReceiveCmdRespService.save(dataEntity);
+            deviceService.reportData(deviceKeyStr);
             // 2. 解析并处理报警数据
             deviceOptionService.onMqttMessage(topic, payload);
+        } else if (topic.contains("heartbeat")) {
+            deviceService.onlineDevice(deviceKeyStr);
         }
     }
 
@@ -95,14 +102,13 @@ public class MqttProcessMessageService {
             // 设置默认值
             environment.setSource(1); // 来源：1上报
             environment.setGmtCreate(new Date());
-            // 解析并设置各个字段值
+            String deviceKeyStr = "";
             if (jsonObject.containsKey("dev")) {
-                Object deviceId = jsonObject.get("dev");
-                if (deviceId != null) {
-                    environment.setDeviceKey(deviceId.toString());
-                }
+                Object deviceKey = jsonObject.get("dev");
+                deviceKeyStr = deviceKey.toString();
+                environment.setDeviceKey(deviceKeyStr);
             }
-
+            // 解析并设置各个字段值
             if (jsonObject.containsKey("temp")) {
                 Object temperature = jsonObject.get("temp");
                 if (temperature != null) {
@@ -194,7 +200,8 @@ public class MqttProcessMessageService {
                 environment.setGmtMeasurement(new Date());
             }
             // 插入到数据库
-            webSocketPushUtil.pushToTopic("/topic/environment", environment);
+            String socketTopic = "/topic/environment/"+ deviceKeyStr;
+            webSocketPushUtil.pushToTopic(socketTopic, environment);
             boolean saved = environmentService.save(environment);
         } catch (Exception e) {
             log.error("处理\"environment数据时发生异常: {}", e.getMessage(), e);

@@ -11,7 +11,7 @@
  Target Server Version : 50725
  File Encoding         : 65001
 
- Date: 31/03/2026 21:54:13
+ Date: 01/04/2026 22:19:51
 */
 
 SET NAMES utf8mb4;
@@ -55,6 +55,22 @@ CREATE TABLE `command`  (
   `is_deleted` tinyint(1) NULL DEFAULT 0 COMMENT '逻辑删除',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '设备反控记录' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for device
+-- ----------------------------
+DROP TABLE IF EXISTS `device`;
+CREATE TABLE `device`  (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `product_key` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '产品标识（冗余字段，方便查询）',
+  `device_key` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '设备唯一标识（用户自定义或系统生成）',
+  `device_name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '设备名称（用户自定义）',
+  `online_status` tinyint(4) NULL DEFAULT 0 COMMENT '在线状态: 0-离线, 1-在线（实时状态）',
+  `last_online_time` datetime NULL DEFAULT NULL COMMENT '最后上线时间',
+  `last_offline_time` datetime NULL DEFAULT NULL COMMENT '最后离线时间',
+  `last_active_time` datetime NULL DEFAULT NULL COMMENT '最后活跃时间（上报数据时间）',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '设备表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for device_option
@@ -142,5 +158,16 @@ CREATE TABLE `mqtt_send_cmd`  (
   INDEX `idx_receive_time`(`send_time`) USING BTREE,
   INDEX `idx_device_id`(`device_key`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'MQTT发送记录-指令表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for user_device_preference
+-- ----------------------------
+DROP TABLE IF EXISTS `user_device_preference`;
+CREATE TABLE `user_device_preference`  (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `user_code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户编码',
+  `device_key` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '设备唯一标识（用户自定义或系统生成）',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '设备表' ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
