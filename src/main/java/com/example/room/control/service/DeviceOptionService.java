@@ -20,7 +20,7 @@ public interface DeviceOptionService extends IService<DeviceOption> {
     // 条件查询分页方法
     Page<DeviceOptionVo> pageQuery(DeviceOptionQuery deviceOptionQuery);
 
-    boolean controlDevice(DeviceOptionControl deviceOption, Long operatorId);
+    boolean controlDevice(DeviceOptionControl deviceOption, String operatorCode);
 
     void onMqttMessage(String topic, String payload);
 }

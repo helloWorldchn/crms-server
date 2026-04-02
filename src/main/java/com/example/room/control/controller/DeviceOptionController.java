@@ -33,8 +33,7 @@ public class DeviceOptionController {
 
     @Resource
     private DeviceOptionService deviceOptionService;
-    @Resource
-    private MqttSendMessageService mqttSendMessageService;
+
     @ApiOperation(value = "所有反控操作记录数据列表")
     @GetMapping("findAll")
     public Result<List<DeviceOption>> findAll() {
@@ -83,9 +82,9 @@ public class DeviceOptionController {
     @PostMapping("control")
     public Result<String> controlDevice(@RequestBody DeviceOptionControl deviceOption, HttpServletRequest request) {
         String token = JwtUtil.getTokenFromRequest(request);
-        Long userIdFromToken = JwtUtil.getAccountIdFromToken(token);
-
-        boolean b = deviceOptionService.controlDevice(deviceOption, userIdFromToken);
+        // Long userIdFromToken = JwtUtil.getAccountIdFromToken(token);
+        String username = JwtUtil.getAccountCodeFromToken(token);
+        boolean b = deviceOptionService.controlDevice(deviceOption, username);
         if (b) {
             return Result.ok("指令已下达");
         } else

@@ -40,7 +40,7 @@ public class DeviceOption implements Serializable {
     private String action;
 
     @ApiModelProperty(value = "操作人")
-    private Long operatorId;
+    private String operatorCode;
 
     @ApiModelProperty(value = "逻辑删除 1（true）已删除， 0（false）未删除")
     @TableLogic

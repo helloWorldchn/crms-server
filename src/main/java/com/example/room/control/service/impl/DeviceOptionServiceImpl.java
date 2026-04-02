@@ -76,17 +76,17 @@ public class DeviceOptionServiceImpl extends ServiceImpl<DeviceOptionMapper, Dev
                 deviceOptionPage.getTotal()
         );
         List<DeviceOption> records = deviceOptionPage.getRecords();
-        List<Long> operatorList = records.stream()
-                .map(DeviceOption::getOperatorId)  // 假设有getOperatorId()方法
+        List<String> operatorList = records.stream()
+                .map(DeviceOption::getOperatorCode)  // 假设有getOperatorId()方法
                 .collect(Collectors.toList());
 
         QueryWrapper<Account> accountQueryWrapper = new QueryWrapper<>();
-        accountQueryWrapper.lambda().in(Account::getId, operatorList);
+        accountQueryWrapper.lambda().in(Account::getUsername, operatorList);
 
         List<Account> accountList = accountMapper.selectList(accountQueryWrapper);
-        Map<Long, String> accountMap = accountList.stream()
+        Map<String, String> accountMap = accountList.stream()
                 .collect(Collectors.toMap(
-                        Account::getId,
+                        Account::getUsername,
                         Account::getNickname   // value: nickname
                 ));
         // 将 DeviceOption 列表转换为 DeviceOptionVo 列表
@@ -95,7 +95,7 @@ public class DeviceOptionServiceImpl extends ServiceImpl<DeviceOptionMapper, Dev
             DeviceOptionVo vo = new DeviceOptionVo();
             BeanUtils.copyProperties(record, vo);
 
-            vo.setOperatorName(accountMap.getOrDefault(record.getOperatorId(), ""));
+            vo.setOperatorName(accountMap.getOrDefault(record.getOperatorCode(), ""));
             voList.add(vo);
         }
 
@@ -112,7 +112,7 @@ public class DeviceOptionServiceImpl extends ServiceImpl<DeviceOptionMapper, Dev
     private final ConcurrentHashMap<String, CompletableFuture<Boolean>> pendingRequests = new ConcurrentHashMap<>();
     private final RequestIdGenerator idGenerator = new RequestIdGenerator();
     @Override
-    public boolean controlDevice(DeviceOptionControl deviceOptionControl, Long operatorId) {
+    public boolean controlDevice(DeviceOptionControl deviceOptionControl, String operatorCode) {
         // 1. send发送MQTT消息到 设备
 
         String requestId = idGenerator.nextId();
@@ -141,7 +141,7 @@ public class DeviceOptionServiceImpl extends ServiceImpl<DeviceOptionMapper, Dev
         deviceOption.setDeviceKey(deviceOptionControl.getDeviceKey());
         assert commandEnum != null;
         deviceOption.setAction(commandEnum.getValue()+ "-"+typeEnum.getName());
-        deviceOption.setOperatorId(operatorId);
+        deviceOption.setOperatorCode(operatorCode);
         deviceOption.setGmtCreate(new Date());
         deviceOption.setIsDeleted(false);
 

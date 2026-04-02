@@ -11,6 +11,7 @@ import com.example.room.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
@@ -21,11 +22,10 @@ import java.util.Objects;
 @RequestMapping("/service/device/default")
 public class UserDevicePreferenceController {
 
-    @Autowired
+    @Resource
     private UserDevicePreferenceService userDevicePreferenceService;
-    @Autowired
-    private JwtUtil jwtUtil;
-    @Autowired
+
+    @Resource
     private DeviceService deviceService;
 
     /**
