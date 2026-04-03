@@ -9,6 +9,7 @@ import com.example.room.environment.entity.dto.EnvironmentStatisticsQuery;
 import com.example.room.util.JwtUtil;
 import com.example.room.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -35,8 +36,9 @@ public class UserDevicePreferenceController {
      */
     @GetMapping("/getDefaultDevice")
     public Result<UserDevicePreference> getDefaultDevice(HttpServletRequest request) {
-        String token = JwtUtil.getTokenFromRequest(request);
-        String code = JwtUtil.getAccountCodeFromToken(token);
+        // String token = JwtUtil.getTokenFromRequest(request);
+        // String code = JwtUtil.getAccountCodeFromToken(token);
+        String code =  SecurityContextHolder.getContext().getAuthentication().getName();
         UserDevicePreference defaultDevice = userDevicePreferenceService.getDefaultDeviceKey(code);
         if (Objects.isNull(defaultDevice)) {
             QueryWrapper<Device> queryWrapper = new QueryWrapper<>();
@@ -57,8 +59,10 @@ public class UserDevicePreferenceController {
      */
     @PostMapping("/setDefaultDevice")
     public Result<Boolean> setDefaultDevice(HttpServletRequest request,@RequestBody(required = false) UserDevicePreference param) {
-        String token = JwtUtil.getTokenFromRequest(request);
-        String userCode = JwtUtil.getAccountCodeFromToken(token);
+        // String token = JwtUtil.getTokenFromRequest(request);
+        // String userCode = JwtUtil.getAccountCodeFromToken(token);
+
+        String userCode =  SecurityContextHolder.getContext().getAuthentication().getName();
         boolean success = userDevicePreferenceService.setDefaultDevice(userCode, param.getDeviceKey());
         
         if (success) {

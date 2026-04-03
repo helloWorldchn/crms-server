@@ -1,6 +1,8 @@
 package com.example.room.util;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * http请求返回的最外层对象
@@ -94,5 +96,22 @@ public class Result<T> implements Serializable {
 
     public static <T> Boolean isSuccess(Result<T> ret) {
         return Result.SUCCESS == ret.getCode();
+    }
+
+    @SuppressWarnings("unchecked")
+    public Result<T> data(String key, Object value) {
+        if (this.data == null) {
+            this.data = (T) new HashMap<String, Object>();
+        }
+        if (this.data instanceof Map) {
+            ((Map<String, Object>) this.data).put(key, value);
+        }
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Result<T> data(Map<String, Object> map) {
+        this.data = (T) map;
+        return this;
     }
 }

@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Api(description = "环境监测数据管理")
 @RestController
 @RequestMapping("/service/environment")
-//@CrossOrigin // 解决跨域问题
+@CrossOrigin // 解决跨域问题
 public class EnvironmentController {
     // 把service注入
     @Resource

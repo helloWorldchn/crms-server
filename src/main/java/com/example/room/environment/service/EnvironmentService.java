@@ -24,6 +24,9 @@ public interface EnvironmentService extends IService<Environment> {
     // 条件查询分页方法
     Page<Environment> pageQuery(EnvironmentQuery environmentQuery);
 
+    /** 按条件全量列表（用于导出等，避免超大分页 LIMIT） */
+    List<Environment> listByQuery(EnvironmentQuery query);
+
     Environment getLastData();
 
     Environment getLastData(String deviceKey);

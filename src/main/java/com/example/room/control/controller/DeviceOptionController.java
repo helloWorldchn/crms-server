@@ -12,6 +12,7 @@ import com.example.room.util.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -81,9 +82,11 @@ public class DeviceOptionController {
     @ApiOperation("反控操作")
     @PostMapping("control")
     public Result<String> controlDevice(@RequestBody DeviceOptionControl deviceOption, HttpServletRequest request) {
-        String token = JwtUtil.getTokenFromRequest(request);
+        // String token = JwtUtil.getTokenFromRequest(request);
         // Long userIdFromToken = JwtUtil.getAccountIdFromToken(token);
-        String username = JwtUtil.getAccountCodeFromToken(token);
+        // String username = JwtUtil.getAccountCodeFromToken(token);
+
+        String username =  SecurityContextHolder.getContext().getAuthentication().getName();
         boolean b = deviceOptionService.controlDevice(deviceOption, username);
         if (b) {
             return Result.ok("指令已下达");
